@@ -18,8 +18,8 @@ package options
 
 import (
 	"flag"
-	"github.com/edgewize/modelmesh/internal/broker"
-	"github.com/edgewize/modelmesh/internal/broker/config"
+	"github.com/edgewize/edgeQ/internal/broker"
+	"github.com/edgewize/edgeQ/internal/broker/config"
 	"k8s.io/klog/v2"
 	"strings"
 

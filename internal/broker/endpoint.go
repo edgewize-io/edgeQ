@@ -2,10 +2,10 @@ package broker
 
 import (
 	"context"
-	v1 "github.com/edgewize/modelmesh/api/modelfulx/v1alpha"
-	"github.com/edgewize/modelmesh/internal/broker/metrics"
-	"github.com/edgewize/modelmesh/internal/broker/picker"
-	"github.com/edgewize/modelmesh/pkg/utils"
+	v1 "github.com/edgewize/edgeQ/api/modelfulx/v1alpha"
+	"github.com/edgewize/edgeQ/internal/broker/metrics"
+	"github.com/edgewize/edgeQ/internal/broker/picker"
+	"github.com/edgewize/edgeQ/pkg/utils"
 	"io"
 	"k8s.io/klog/v2"
 	"sync"

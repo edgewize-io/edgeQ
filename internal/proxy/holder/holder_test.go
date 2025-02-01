@@ -2,7 +2,7 @@ package holder
 
 import (
 	"context"
-	"github.com/edgewize/modelmesh/pkg/utils"
+	"github.com/edgewize/edgeQ/pkg/utils"
 	"reflect"
 	"testing"
 	"time"

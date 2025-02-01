@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	mindspore_serving_proto "github.com/edgewize/modelmesh/mindspore_serving/proto"
-	xconfig "github.com/edgewize/modelmesh/pkg/config"
-	"github.com/edgewize/modelmesh/pkg/transport/grpc"
+	mindspore_serving_proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
+	xconfig "github.com/edgewize/edgeQ/pkg/config"
+	"github.com/edgewize/edgeQ/pkg/transport/grpc"
 	"k8s.io/klog/v2"
 	"time"
 )

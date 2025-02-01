@@ -1,13 +1,13 @@
 package picker
 
 import (
-	errs "github.com/edgewize/modelmesh/internal/broker/error"
+	errs "github.com/edgewize/edgeQ/internal/broker/error"
 	"math"
 	"math/rand"
 	"sync"
 	"time"
 
-	"github.com/edgewize/modelmesh/internal/broker/picker/priorityqueue"
+	"github.com/edgewize/edgeQ/internal/broker/picker/priorityqueue"
 )
 
 const recordTimes = 10

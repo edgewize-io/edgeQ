@@ -2,7 +2,7 @@ package picker
 
 import (
 	"context"
-	xconfig "github.com/edgewize/modelmesh/pkg/config"
+	xconfig "github.com/edgewize/edgeQ/pkg/config"
 	"google.golang.org/grpc/attributes"
 	"google.golang.org/grpc/metadata"
 )

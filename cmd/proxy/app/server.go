@@ -19,8 +19,8 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/edgewize/modelmesh/cmd/proxy/app/options"
-	"github.com/edgewize/modelmesh/internal/proxy/config"
+	"github.com/edgewize/edgeQ/cmd/proxy/app/options"
+	"github.com/edgewize/edgeQ/internal/proxy/config"
 	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
 

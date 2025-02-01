@@ -2,8 +2,8 @@ package broker
 
 import (
 	"fmt"
-	"github.com/edgewize/modelmesh/internal/broker/config"
-	"github.com/edgewize/modelmesh/internal/broker/picker"
+	"github.com/edgewize/edgeQ/internal/broker/config"
+	"github.com/edgewize/edgeQ/internal/broker/picker"
 	"k8s.io/klog/v2"
 )
 

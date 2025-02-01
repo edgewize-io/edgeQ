@@ -3,9 +3,9 @@ package proxy
 import (
 	"context"
 	"fmt"
-	v1 "github.com/edgewize/modelmesh/api/modelfulx/v1alpha"
-	proto "github.com/edgewize/modelmesh/mindspore_serving/proto"
-	"github.com/edgewize/modelmesh/pkg/utils"
+	v1 "github.com/edgewize/edgeQ/api/modelfulx/v1alpha"
+	proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
+	"github.com/edgewize/edgeQ/pkg/utils"
 	"k8s.io/klog/v2"
 )
 

@@ -1,4 +1,4 @@
-module github.com/edgewize/modelmesh
+module github.com/edgewize/edgeQ
 
 go 1.21
 
@@ -27,6 +27,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-gota/gota v0.12.0
 	github.com/go-kit/kit v0.12.0
+	github.com/golang/snappy v0.0.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/mwitkow/go-proto-validators v0.3.2
@@ -34,6 +35,8 @@ require (
 	github.com/onsi/gomega v1.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
+	github.com/prometheus/client_model v0.4.0
+	github.com/prometheus/common v0.44.0
 	github.com/smallnest/deepcopy v1.0.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.8.1
@@ -71,8 +74,6 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.3 // indirect
-	github.com/prometheus/client_model v0.4.0 // indirect
-	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect

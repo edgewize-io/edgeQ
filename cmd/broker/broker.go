@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/edgewize/modelmesh/cmd/broker/app"
+	"github.com/edgewize/edgeQ/cmd/broker/app"
 	"log"
 )
 

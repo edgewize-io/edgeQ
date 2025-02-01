@@ -1,13 +1,13 @@
 
-# Edgewize ModelMesh
+# Edgewize EdgeQ
 
-`Edgewize ModelMesh` is an inference service governance framework that supports multiple model services. It enhances the management of inference services by providing capabilities such as multi-model sharing, traffic governance, auditing, security, and scalability.
+`Edgewize EdgeQ` is an inference service governance framework that supports multiple model services. It enhances the management of inference services by providing capabilities such as multi-model sharing, traffic governance, auditing, security, and scalability.
 
 [English](README.md) | [中文](README_cn.md)
 
 ## Overview
 
-`Edgewize ModelMesh` addresses the following key challenges:
+`Edgewize EdgeQ` addresses the following key challenges:
 
 * **Multi-Model Hardware Sharing**: Efficiently manage and share hardware resources among multiple models.
 * **Hierarchical Computing Power Supply**: Provide a hierarchical allocation of computational resources for models.
@@ -25,13 +25,13 @@
 
 ## Getting Started
 
-To get started with `Edgewize ModelMesh`, refer to the [documentation](https://github.com/edgewizemodelmesh/modelmesh).
+To get started with `Edgewize EdgeQ`, refer to the [documentation](https://github.com/edgewize/edgeQ/modelmesh).
 
 ## Community and Support
 
 For discussions, support, and collaboration, you can engage with the community through the following channels:
 
-* [GitHub Repository](https://github.com/edgewizemodelmesh/modelmesh)
+* [GitHub Repository](https://github.com/edgewize/edgeQ)
 * [Community Forum](https://community.edgewize.com/)
 
 ## Contributions
@@ -40,7 +40,7 @@ Contributions to `Edgewize ModelMesh` are welcome. If you encounter issues or ha
 
 ## License
 
-`Edgewize ModelMesh` is licensed under the [MIT License](LICENSE).
+`Edgewize EdgeQ` is licensed under the [MIT License](LICENSE).
 
 
 

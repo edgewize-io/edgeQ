@@ -2,8 +2,8 @@ package broker
 
 import (
 	"context"
-	"github.com/edgewize/modelmesh/internal/broker/config"
-	errs "github.com/edgewize/modelmesh/internal/broker/error"
+	"github.com/edgewize/edgeQ/internal/broker/config"
+	errs "github.com/edgewize/edgeQ/internal/broker/error"
 )
 
 type QueueSelect func() (serviceGroup string, err error)

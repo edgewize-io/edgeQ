@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"context"
-	"github.com/edgewize/modelmesh/internal/broker/config"
+	"github.com/edgewize/edgeQ/internal/broker/config"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

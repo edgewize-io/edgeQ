@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/edgewize/modelmesh/internal/msc"
+	"github.com/edgewize/edgeQ/internal/msc"
 	"github.com/ghodss/yaml"
 	"io"
 	"os"

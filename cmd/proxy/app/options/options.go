@@ -18,8 +18,8 @@ package options
 
 import (
 	"flag"
-	"github.com/edgewize/modelmesh/internal/proxy"
-	"github.com/edgewize/modelmesh/internal/proxy/config"
+	"github.com/edgewize/edgeQ/internal/proxy"
+	"github.com/edgewize/edgeQ/internal/proxy/config"
 	"k8s.io/klog/v2"
 	"strings"
 

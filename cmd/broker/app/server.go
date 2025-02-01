@@ -19,8 +19,8 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/edgewize/modelmesh/cmd/broker/app/options"
-	"github.com/edgewize/modelmesh/internal/broker/config"
+	"github.com/edgewize/edgeQ/cmd/broker/app/options"
+	"github.com/edgewize/edgeQ/internal/broker/config"
 	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
 

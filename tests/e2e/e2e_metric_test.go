@@ -2,7 +2,7 @@ package e2e_test
 
 import (
 	"fmt"
-	. "github.com/edgewize/modelmesh/tests/e2e"
+	. "github.com/edgewize/edgeQ/tests/e2e"
 )
 
 type Dog struct {

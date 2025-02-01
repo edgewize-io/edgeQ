@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"context"
-	pb "github.com/edgewize/modelmesh/mindspore_serving/proto"
+	pb "github.com/edgewize/edgeQ/mindspore_serving/proto"
 	"k8s.io/klog/v2"
 )
 

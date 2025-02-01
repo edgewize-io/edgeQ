@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/edgewize/modelmesh/cmd/msc/app"
+	"github.com/edgewize/edgeQ/cmd/msc/app"
 	"log"
 )
 

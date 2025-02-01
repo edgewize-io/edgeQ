@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	brokerconfig "github.com/edgewize/modelmesh/internal/broker/config"
-	mindspore_serving_proto "github.com/edgewize/modelmesh/mindspore_serving/proto"
-	"github.com/edgewize/modelmesh/pkg/transport/grpc"
-	"github.com/edgewize/modelmesh/pkg/utils"
+	brokerconfig "github.com/edgewize/edgeQ/internal/broker/config"
+	mindspore_serving_proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
+	"github.com/edgewize/edgeQ/pkg/transport/grpc"
+	"github.com/edgewize/edgeQ/pkg/utils"
 	"k8s.io/klog/v2"
 	"net"
 )

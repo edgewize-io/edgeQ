@@ -18,7 +18,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/edgewize/modelmesh/pkg/constants"
+	"github.com/edgewize/edgeQ/pkg/constants"
 	"strings"
 	"sync"
 	"time"

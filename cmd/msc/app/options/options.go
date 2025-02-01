@@ -2,7 +2,7 @@ package options
 
 import (
 	"flag"
-	"github.com/edgewize/modelmesh/internal/msc/config"
+	"github.com/edgewize/edgeQ/internal/msc/config"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	"strings"

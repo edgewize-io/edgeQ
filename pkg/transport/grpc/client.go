@@ -19,9 +19,9 @@ package grpc
 import (
 	"context"
 	"fmt"
-	v1 "github.com/edgewize/modelmesh/api/modelfulx/v1alpha"
-	"github.com/edgewize/modelmesh/internal/broker/config"
-	proto "github.com/edgewize/modelmesh/mindspore_serving/proto"
+	v1 "github.com/edgewize/edgeQ/api/modelfulx/v1alpha"
+	"github.com/edgewize/edgeQ/internal/broker/config"
+	proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

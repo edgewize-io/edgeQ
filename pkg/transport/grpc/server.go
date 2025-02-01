@@ -17,8 +17,8 @@
 package grpc
 
 import (
-	"github.com/edgewize/modelmesh/internal/broker/config"
-	"github.com/edgewize/modelmesh/pkg/transport/grpc/middleware"
+	"github.com/edgewize/edgeQ/internal/broker/config"
+	"github.com/edgewize/edgeQ/pkg/transport/grpc/middleware"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"

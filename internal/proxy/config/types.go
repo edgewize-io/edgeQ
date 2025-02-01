@@ -1,7 +1,7 @@
 package config
 
 import (
-	xconfig "github.com/edgewize/modelmesh/pkg/config"
+	xconfig "github.com/edgewize/edgeQ/pkg/config"
 )
 
 // RPCClient is RPC client config.

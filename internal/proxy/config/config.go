@@ -17,7 +17,7 @@ limitations under the License.
 package config
 
 import (
-	"github.com/edgewize/modelmesh/pkg/constants"
+	"github.com/edgewize/edgeQ/pkg/constants"
 	"os"
 	"strings"
 	"sync"

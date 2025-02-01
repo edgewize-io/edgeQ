@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/edgewize/modelmesh/cmd/proxy/app"
+	"github.com/edgewize/edgeQ/cmd/proxy/app"
 	"log"
 )
 

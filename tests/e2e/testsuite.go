@@ -3,12 +3,12 @@ package e2e
 import (
 	"context"
 	"fmt"
-	proxyoptions "github.com/edgewize/modelmesh/cmd/proxy/app/options"
-	brokerconfig "github.com/edgewize/modelmesh/internal/broker/config"
-	mindspore_serving_proto "github.com/edgewize/modelmesh/mindspore_serving/proto"
-	xconfig "github.com/edgewize/modelmesh/pkg/config"
-	"github.com/edgewize/modelmesh/pkg/transport/grpc"
-	"github.com/edgewize/modelmesh/pkg/utils"
+	proxyoptions "github.com/edgewize/edgeQ/cmd/proxy/app/options"
+	brokerconfig "github.com/edgewize/edgeQ/internal/broker/config"
+	mindspore_serving_proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
+	xconfig "github.com/edgewize/edgeQ/pkg/config"
+	"github.com/edgewize/edgeQ/pkg/transport/grpc"
+	"github.com/edgewize/edgeQ/pkg/utils"
 	"k8s.io/klog/v2"
 	"net"
 )

@@ -3,8 +3,8 @@ package proxy
 import (
 	"context"
 	"fmt"
-	v1 "github.com/edgewize/modelmesh/api/modelfulx/v1alpha"
-	"github.com/edgewize/modelmesh/internal/broker/config"
+	v1 "github.com/edgewize/edgeQ/api/modelfulx/v1alpha"
+	"github.com/edgewize/edgeQ/internal/broker/config"
 	"time"
 )
 

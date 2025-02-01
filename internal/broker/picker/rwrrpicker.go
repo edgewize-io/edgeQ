@@ -1,7 +1,7 @@
 package picker
 
 import (
-	errs "github.com/edgewize/modelmesh/internal/broker/error"
+	errs "github.com/edgewize/edgeQ/internal/broker/error"
 	"math/rand"
 	"sync"
 	"time"

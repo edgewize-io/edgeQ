@@ -6,7 +6,7 @@ package v1
 import (
 	context "context"
 	fmt "fmt"
-	proto1 "github.com/edgewize/modelmesh/mindspore_serving/proto"
+	proto1 "github.com/edgewize/edgeQ/mindspore_serving/proto"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	math "math"

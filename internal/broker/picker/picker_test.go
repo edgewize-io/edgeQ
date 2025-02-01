@@ -2,8 +2,8 @@ package picker_test
 
 import (
 	"fmt"
-	"github.com/edgewize/modelmesh/internal/broker/picker"
-	xconfig "github.com/edgewize/modelmesh/pkg/config"
+	"github.com/edgewize/edgeQ/internal/broker/picker"
+	xconfig "github.com/edgewize/edgeQ/pkg/config"
 	"sync"
 
 	. "github.com/onsi/ginkgo/v2"

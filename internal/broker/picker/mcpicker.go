@@ -1,8 +1,8 @@
 package picker
 
 import (
-	errs "github.com/edgewize/modelmesh/internal/broker/error"
-	"github.com/edgewize/modelmesh/internal/broker/picker/priorityqueue"
+	errs "github.com/edgewize/edgeQ/internal/broker/error"
+	"github.com/edgewize/edgeQ/internal/broker/picker/priorityqueue"
 	"math/rand"
 	"sync"
 )
