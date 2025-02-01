@@ -1,0 +1,36 @@
+base:
+  profpathprefix: debug
+  loglevel: info
+  profenable: false
+  tracerenable: false
+  whitelist: [ ]
+  endpoints: [ ]
+  baseconfig: ""
+brokerServer:
+  addr: :8010
+  timeout: 3s
+  idletimeout: 1m0s
+  maxlifetime: 2h0m0s
+  forceclosewait: 20s
+  keepaliveinterval: 1m0s
+  keepalivetimeout: 20s
+  maxmessagesize: 1048576
+  maxconcurrentstreams: 1024
+  enableopentracing: false
+schedule:
+  method: RR
+queue:
+  size: 10
+dispatch:
+  queue:
+    size: 10
+  client:
+    addr: 127.0.0.1:5500
+    timeout: 5s
+serviceGroups:
+  - name: default
+    weight: 100
+  - name: pay-service
+    weight: 200
+  - name: security-service
+    weight: 300

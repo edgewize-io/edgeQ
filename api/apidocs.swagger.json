@@ -1,0 +1,249 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/serving/v1/serv.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Serv"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/serv": {
+      "get": {
+        "operationId": "Serv_ListServ",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListServResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Serv"
+        ]
+      },
+      "post": {
+        "operationId": "Serv_CreateServ",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateServResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateServRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Serv"
+        ]
+      }
+    },
+    "/serv/{uid}": {
+      "get": {
+        "operationId": "Serv_GetServ",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetServResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Serv"
+        ]
+      },
+      "delete": {
+        "operationId": "Serv_DeleteServ",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteServResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Serv"
+        ]
+      },
+      "put": {
+        "operationId": "Serv_UpdateServ",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateServResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "obj": {
+                  "$ref": "#/definitions/v1ServObject"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "Serv"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateServRequest": {
+      "type": "object",
+      "properties": {
+        "obj": {
+          "$ref": "#/definitions/v1ServObject"
+        }
+      }
+    },
+    "v1CreateServResponse": {
+      "type": "object"
+    },
+    "v1DeleteServResponse": {
+      "type": "object",
+      "properties": {
+        "obj": {
+          "$ref": "#/definitions/v1ServObject"
+        }
+      }
+    },
+    "v1GetServResponse": {
+      "type": "object",
+      "properties": {
+        "obj": {
+          "$ref": "#/definitions/v1ServObject"
+        }
+      }
+    },
+    "v1ListServResponse": {
+      "type": "object",
+      "properties": {
+        "objList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ServObject"
+          }
+        }
+      }
+    },
+    "v1ServObject": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateServResponse": {
+      "type": "object"
+    }
+  }
+}

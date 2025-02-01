@@ -1,0 +1,28 @@
+base:
+  profpathprefix: debug
+  loglevel: info
+  profenable: false
+  tracerenable: false
+  whitelist: []
+  endpoints: []
+  baseconfig: ""
+proxyServer:
+  addr: :8080
+  timeout: 5s
+  idletimeout: 1m0s
+  maxlifetime: 2h0m0s
+  forceclosewait: 20s
+  keepaliveinterval: 1m0s
+  keepalivetimeout: 20s
+  maxmessagesize: 1048576
+  maxconcurrentstreams: 1024
+  enableopentracing: false
+dispatch:
+  timeout: 30s
+  queue:
+    size: 10
+  client:
+    addr: 172.31.73.54:8010
+    timeout: 5s
+serviceGroup:
+  name: pay

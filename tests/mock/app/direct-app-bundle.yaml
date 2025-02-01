@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: direct-app-mock
+  namespace: nonghang
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: direct-app-mock
+  template:
+    metadata:
+      labels:
+        app: direct-app-mock
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: accelerator
+                    operator: In
+                    values:
+                      - huawei-Ascend310
+                  - key: node-role.kubernetes.io/edge
+                    operator: Exists
+      tolerations:
+        - key: node-role.kubernetes.io/edge
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: resnet-client-container
+          image: resnet-client-image:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+              value: "python"
+            - name: ABS_IMAGES_PATH
+              value: "/mnt/serving/example/resnet/small_images"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: DIRECT_BACKEND_HOST
+              value: "192.168.1.100:5500"
+            - name: THREAD_NUM
+              value: "20"

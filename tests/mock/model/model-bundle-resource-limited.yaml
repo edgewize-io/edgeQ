@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindspore-model-deployment-resource-limited
+  namespace: nonghang
+  labels:
+    app: model-mock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-mock
+      model-sidecar-injection: enabled
+  template:
+    metadata:
+      labels:
+        app: model-mock
+        model-sidecar-injection: enabled
+      annotations:
+        broker-sidecar.edgewize.io/model-port: "5500"
+        broker-sidecar.edgewize.io/metrics-port: "5501"
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: model-mock-container
+          image: harbor.dev.thingsdao.com/public-ascendhub/mindspore-server:demo
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 500Mi
+            requests:
+              cpu: 800m
+              memory: 200Mi
+          ports:
+            - name: grpc
+              containerPort: 5500
+              protocol: TCP
+            - name: metrics
+              containerPort: 5501
+              protocol: TCP
+            - name: pprof
+              containerPort: 6060
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-mock-service
+  namespace: nonghang
+  labels:
+    app.kubernetes.io/name: model-mock
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8010
+      targetPort: 8010
+      protocol: TCP
+      name: broker
+    - port: 5500
+      targetPort: 5500
+      protocol: TCP
+      name: lenet
+    - port: 5501
+      targetPort: 5501
+      protocol: TCP
+      name: metrics
+    - port: 6060
+      targetPort: 6060
+      protocol: TCP
+      name: pprof
+  selector:
+    app: model-mock
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: broker-monitor
+  namespace: nonghang
+  labels:
+    app: broker-monitor
+spec:
+  jobLabel: broker
+  endpoints:
+    - port: metrics
+      interval: 30s
+      scrapeTimeout: 10s
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: model-mock
