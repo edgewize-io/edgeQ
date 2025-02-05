@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-qos-test-client
+  namespace: project-wuhan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edge-qos-test-client
+  template:
+    metadata:
+      labels:
+        app: edge-qos-test-client
+        "proxy.edge-qos.edgewize.io/injection": "enabled"
+        "server.edge-qos.edgewize.io/name": "nginx-backend-nng-wuhan-edgenode-xe3u"
+        "server.edge-qos.edgewize.io/namespace": "project-wuhan"
+        "client.edge-qos.edgewize.io/servicegroup": "security"
+    spec:
+      containers:
+        - name: test-client
+          image: mirrors.thingsdao.com/edgewize/init-iptables:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sleep
+            - "10000"
+      nodeSelector:
+        kubernetes.io/hostname: edgenode-xe3u
+      tolerations:
+        - key: node-role.kubernetes.io/edge
+          operator: Exists
+          effect: NoSchedule
+

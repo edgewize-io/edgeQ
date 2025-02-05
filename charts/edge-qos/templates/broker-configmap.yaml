@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-qos-broker
+  namespace: {{ .Release.Namespace }}
+data:
+  edge-qos-broker.yaml: |
+    {{- .Values.edgeQosBroker.conf | toYaml | nindent 4 }}

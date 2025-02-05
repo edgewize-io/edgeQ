@@ -4,40 +4,47 @@ import (
 	"time"
 )
 
-// RPCClient is RPC client config.
 type GRPCClient struct {
 	Addr    string        `yaml:"addr,omitempty" json:"addr,omitempty" mapstructure:"addr"`
 	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" mapstructure:"timeout"`
 }
 
+type MeshProxy struct {
+	Addr            string        `yaml:"addr,omitempty" json:"addr,omitempty" mapstructure:"addr"`
+	DialTimeout     time.Duration `yaml:"dialTimeout,omitempty" json:"dialTimeout,omitempty" mapstructure:"dialTimeout"`
+	KeepAlive       time.Duration `yaml:"keepAlive,omitempty" json:"keepAlive,omitempty" mapstructure:"keepAlive"`
+	HeaderTimeout   time.Duration `yaml:"headerTimeout,omitempty" json:"headerTimeout,omitempty" mapstructure:"headerTimeout"`
+	IdleConnTimeout time.Duration `yaml:"idleConnTimeout,omitempty" json:"idleConnTimeout,omitempty" mapstructure:"idleConnTimeout"`
+	MaxIdleConns    int           `yaml:"maxIdleConns,omitempty" json:"maxIdleConns,omitempty" mapstructure:"maxIdleConns"`
+	MaxConnsPerHost int           `yaml:"maxConnsPerHost,omitempty" json:"maxConnsPerHost,omitempty" mapstructure:"maxConnsPerHost"`
+	ReadTimeout     time.Duration `yaml:"readTimeout,omitempty" json:"readTimeout,omitempty" mapstructure:"readTimeout"`
+	WriteTimeout    time.Duration `yaml:"writeTimeout,omitempty" json:"writeTimeout,omitempty" mapstructure:"writeTimeout"`
+}
+
 // RPCServer is RPC server config.
-type GRPCServer struct {
-	Addr                 string        `yaml:"addr,omitempty" json:"addr,omitempty" mapstructure:"addr"`
-	Timeout              time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" mapstructure:"timeout"`
-	IdleTimeout          time.Duration `yaml:"idleTimeout,omitempty" json:"idleTimeout,omitempty" mapstructure:"idleTimeout"`
-	MaxLifeTime          time.Duration `yaml:"maxLifeTime,omitempty" json:"maxLifeTime,omitempty" mapstructure:"maxLifeTime"`
-	ForceCloseWait       time.Duration `yaml:"forceCloseWait,omitempty" json:"forceCloseWait,omitempty" mapstructure:"forceCloseWait"`
-	KeepAliveInterval    time.Duration `yaml:"keepAliveInterval,omitempty" json:"keepAliveInterval,omitempty" mapstructure:"keepAliveInterval"`
-	KeepAliveTimeout     time.Duration `yaml:"keepAliveTimeout,omitempty" json:"keepAliveTimeout,omitempty" mapstructure:"keepAliveTimeout"`
-	MaxMessageSize       int32         `yaml:"maxMessageSize,omitempty" json:"maxMessageSize,omitempty" mapstructure:"maxMessageSize"`
-	MaxConcurrentStreams int32         `yaml:"maxConcurrentStreams,omitempty" json:"maxConcurrentStreams,omitempty" mapstructure:"maxConcurrentStreams"`
-	EnableOpenTracing    bool          `yaml:"enableOpenTracing,omitempty" json:"enableOpenTracing,omitempty" mapstructure:"enableOpenTracing"`
+type MeshServer struct {
+	Addr            string        `yaml:"addr,omitempty" json:"addr,omitempty" mapstructure:"addr"`
+	DialTimeout     time.Duration `yaml:"dialTimeout,omitempty" json:"dialTimeout,omitempty" mapstructure:"dialTimeout"`
+	KeepAlive       time.Duration `yaml:"keepAlive,omitempty" json:"keepAlive,omitempty" mapstructure:"keepAlive"`
+	HeaderTimeout   time.Duration `yaml:"headerTimeout,omitempty" json:"headerTimeout,omitempty" mapstructure:"headerTimeout"`
+	IdleConnTimeout time.Duration `yaml:"idleConnTimeout,omitempty" json:"idleConnTimeout,omitempty" mapstructure:"idleConnTimeout"`
+	MaxIdleConns    int           `yaml:"maxIdleConns,omitempty" json:"maxIdleConns,omitempty" mapstructure:"maxIdleConns"`
+	MaxConnsPerHost int           `yaml:"maxConnsPerHost,omitempty" json:"maxConnsPerHost,omitempty" mapstructure:"maxConnsPerHost"`
+	ReadTimeout     time.Duration `yaml:"readTimeout,omitempty" json:"readTimeout,omitempty" mapstructure:"readTimeout"`
+	WriteTimeout    time.Duration `yaml:"writeTimeout,omitempty" json:"writeTimeout,omitempty" mapstructure:"writeTimeout"`
+	WorkPoolSize    int           `yaml:"workPoolSize,omitempty" json:"workPoolSize,omitempty" mapstructure:"workPoolSize"`
 }
 
 type BaseConfig struct {
-	ProfPathPrefix string   `yaml:"profPathPrefix,omitempty" json:"profPathPrefix,omitempty" mapstructure:"profPathPrefix"`
-	LogLevel       string   `yaml:"logLevel,omitempty" json:"logLevel,omitempty" mapstructure:"logLevel"`
-	ProfEnable     bool     `yaml:"profEnable,omitempty" json:"profEnable,omitempty" mapstructure:"profEnable"`
-	TracerEnable   bool     `yaml:"tracerEnable,omitempty" json:"tracerEnable,omitempty" mapstructure:"tracerEnable"`
-	WhiteList      []string `yaml:"whiteList,omitempty" json:"whiteList,omitempty" mapstructure:"whiteList"`
-	Endpoints      []string `yaml:"endpoints,omitempty" json:"endpoints,omitempty" mapstructure:"endpoints"`
-	BaseConfig     string   `yaml:"baseConfig,omitempty" json:"baseConfig,omitempty" mapstructure:"baseConfig"`
+	ProfPathPrefix string `yaml:"profPathPrefix,omitempty" json:"profPathPrefix,omitempty" mapstructure:"profPathPrefix"`
+	LogLevel       string `yaml:"logLevel,omitempty" json:"logLevel,omitempty" mapstructure:"logLevel"`
+	ProfEnable     bool   `yaml:"profEnable,omitempty" json:"profEnable,omitempty" mapstructure:"profEnable"`
 }
 
 // ServiceQueue 封装底层 ServingServer 并提供 ServiceQueue 抽象，一个 ServiceQueue 可以设置对应的调度策略
 type Schedule struct {
-	Method             string `yaml:"method,omitempty" json:"method,omitempty" mapstructure:"method"`
-	DisableFlowControl bool   `yaml:"disableFlowControl,omitempty" json:"disableFlowControl,omitempty" mapstructure:"disableFlowControl"`
+	Method            string `yaml:"method,omitempty" json:"method,omitempty" mapstructure:"method"`
+	EnableFlowControl bool   `yaml:"enableFlowControl,omitempty" json:"enableFlowControl,omitempty" mapstructure:"enableFlowControl"`
 }
 
 // ServiceGroup 表示一个服务组，服务组的资源分配基于权重，权重高的服务组可以获得更多的资源，具体调度策略由 ServiceQueue 的 SchedulingMethod 决定
@@ -52,23 +59,16 @@ type ServiceGroup struct {
 	Weight int32 `yaml:"weight,omitempty" json:"weight,omitempty" mapstructure:"weight"`
 }
 
-func (sg *ServiceGroup) ResourceName() string {
+func (sg ServiceGroup) ResourceName() string {
 	return sg.Name
 }
 
 type Queue struct {
-	Size int64 `yaml:"size,omitempty" json:"size,omitempty" mapstructure:"size"` // 服务队列大小
-}
-
-// ServiceQueue 封装底层 ServingServer 并提供 ServiceQueue 抽象，一个 ServiceQueue 可以设置对应的调度策略
-type Dispatch struct {
-	PoolSize int           `yaml:"poolSize,omitempty" json:"poolSize,omitempty" mapstructure:"poolSize"`
-	Timeout  time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" mapstructure:"timeout"`
-	Queue    *Queue        `yaml:"queue,omitempty" json:"queue,omitempty" mapstructure:"queue"` // 等待队列
-	Client   *GRPCClient   `yaml:"client,omitempty" json:"client,omitempty" mapstructure:"client"`
+	Size int `yaml:"size,omitempty" json:"size,omitempty" mapstructure:"size"` // 服务队列大小
 }
 
 type PromMetrics struct {
 	Addr           string        `yaml:"addr,omitempty" json:"addr,omitempty" mapstructure:"addr"`
 	ScrapeInterval time.Duration `yaml:"scrapeInterval,omitempty" json:"scrapeInterval,omitempty" mapstructure:"scrapeInterval"`
+	RemoteWriteURL string        `yaml:"remoteWriteURL,omitempty" json:"remoteWriteURL,omitempty" mapstructure:"remoteWriteURL"`
 }

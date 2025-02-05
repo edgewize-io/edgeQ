@@ -17,43 +17,15 @@ limitations under the License.
 package config
 
 import (
+	"fmt"
 	"github.com/edgewize/edgeQ/pkg/constants"
-	"os"
-	"strings"
-	"sync"
-	"time"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"k8s.io/klog/v2"
+	"strings"
+	"sync"
+	"time"
 )
-
-// Package config saves configuration for running ModelMesh components
-//
-// Config can be configured from command line flags and configuration file.
-// Command line flags hold higher priority than configuration file. But if
-// component Endpoint/Host/APIServer was left empty, all of that component
-// command line flags will be ignored, use configuration file instead.
-// For example, we have configuration file
-//
-// mysql:
-//   host: mysql.kubesphere-system.svc
-//   username: root
-//   password: password
-//
-// At the same time, have command line flags like following:
-//
-// --mysql-host mysql.openpitrix-system.svc --mysql-username king --mysql-password 1234
-//
-// We will use `king:1234@mysql.openpitrix-system.svc` from command line flags rather
-// than `root:password@mysql.kubesphere-system.svc` from configuration file,
-// cause command line has higher priority. But if command line flags like following:
-//
-// --mysql-username root --mysql-password password
-//
-// we will `root:password@mysql.kubesphere-system.svc` as input, cause
-// mysql-host is missing in command line flags, all other mysql command line flags
-// will be ignored.
 
 var (
 	// singleton instance of config package
@@ -63,12 +35,10 @@ var (
 
 const (
 	// DefaultConfigurationName is the default name of configuration
-	defaultConfigurationName = "model-mesh-proxy"
+	defaultConfigurationName = "edge-qos-proxy"
 
 	// DefaultConfigurationPath the default location of the configuration file
-	defaultConfigurationPath = "/etc/model-mesh-proxy"
-
-	defaultBrokerAddr = ":5100"
+	defaultConfigurationPath = "/etc/edge-qos-proxy"
 )
 
 type config struct {
@@ -128,34 +98,21 @@ func defaultConfig() *config {
 // New config creates a default non-empty Config
 func New() *Config {
 	return &Config{
-		BaseOptions: &BaseConfig{
+		BaseOptions: BaseConfig{
 			LogLevel:       "info",
-			WhiteList:      []string{},
 			ProfEnable:     false,
-			TracerEnable:   false,
 			ProfPathPrefix: "debug",
-			BaseConfig:     "",
 		},
-		ProxyServer: &GRPCServer{
-			Addr:                 defaultBrokerAddr,
-			Timeout:              time.Second * 1,
-			IdleTimeout:          time.Second * 60,
-			MaxLifeTime:          time.Hour * 2,
-			ForceCloseWait:       time.Second * 20,
-			KeepAliveInterval:    time.Second * 60,
-			KeepAliveTimeout:     time.Second * 20,
-			MaxMessageSize:       1024 * 1024,
-			MaxConcurrentStreams: 1024,
-		},
-		Dispatch: &Dispatch{
-			Timeout: time.Second * 10,
-			Client: &GRPCClient{
-				Addr:    defaultBrokerAddr,
-				Timeout: time.Second * 5,
-			},
-			Queue: &Queue{
-				Size: 10,
-			},
+		Proxy: MeshProxy{
+			Addr:            fmt.Sprintf("%s:%s", "127.0.0.1", constants.DefaultProxyContainerPort),
+			DialTimeout:     time.Second * 30,
+			KeepAlive:       time.Second * 30,
+			HeaderTimeout:   time.Second * 20,
+			IdleConnTimeout: time.Second * 120,
+			MaxIdleConns:    1000,
+			MaxConnsPerHost: 1000,
+			ReadTimeout:     time.Second * 30,
+			WriteTimeout:    time.Second * 30,
 		},
 	}
 }
@@ -169,24 +126,4 @@ func TryLoadFromDisk() (*Config, error) {
 // WatchConfigChange return config change channel
 func WatchConfigChange() <-chan Config {
 	return _config.watchConfig()
-}
-
-func (proxyCfg *Config) LoadConfigFromEnv() {
-	if proxyCfg == nil {
-		return
-	}
-
-	proxyServiceGroup := os.Getenv(constants.ProxyServiceGroupEnv)
-	if proxyServiceGroup == "" {
-		proxyServiceGroup = constants.DefaultServiceGroup
-	}
-
-	proxyCfg.ServiceGroup = &ServiceGroup{
-		Name: proxyServiceGroup,
-	}
-
-	serverBrokerEndpoint := os.Getenv(constants.ServerBrokerEndpointEnv)
-	if proxyCfg.Dispatch != nil && proxyCfg.Dispatch.Client != nil {
-		proxyCfg.Dispatch.Client.Addr = serverBrokerEndpoint
-	}
 }

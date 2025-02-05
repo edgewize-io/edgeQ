@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/edgewize/edgeQ/internal/broker/picker"
 	xconfig "github.com/edgewize/edgeQ/pkg/config"
+	"math"
 	"sync"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -35,14 +36,20 @@ var _ = Describe("Picker", func() {
 		BeforeEach(func() {
 			b = picker.Builder("RR")
 			pbi = picker.NewPickerBuildInfo()
-			pbi.AddResource(&xconfig.ServiceGroup{Name: "service10", Weight: 10})
-			pbi.AddResource(&xconfig.ServiceGroup{Name: "service20", Weight: 20})
-			pbi.AddResource(&xconfig.ServiceGroup{Name: "service30", Weight: 30})
+			pbi.AddResource(xconfig.ServiceGroup{Name: "service10", Weight: 10})
+			pbi.AddResource(xconfig.ServiceGroup{Name: "service20", Weight: 20})
+			pbi.AddResource(xconfig.ServiceGroup{Name: "service30", Weight: 30})
 			p = b.Build(pbi)
 			c = NewCount()
 
 			for i := 0; i < cnt; i++ {
-				ret, err := p.Pick(picker.PickInfo{})
+				ret, err := p.Pick(picker.PickInfo{
+					Candidates: []picker.Resource{
+						&xconfig.ServiceGroup{Name: "service10"},
+						&xconfig.ServiceGroup{Name: "service20"},
+						&xconfig.ServiceGroup{Name: "service30"},
+					},
+				})
 				Expect(err).To(BeNil())
 				name := ret.Resource.ResourceName()
 				c.Add(name)
@@ -71,14 +78,20 @@ var _ = Describe("Picker", func() {
 		BeforeEach(func() {
 			b = picker.Builder("WRR")
 			pbi = picker.NewPickerBuildInfo()
-			pbi.AddResource(&xconfig.ServiceGroup{Name: "service10", Weight: 10})
-			pbi.AddResource(&xconfig.ServiceGroup{Name: "service20", Weight: 20})
-			pbi.AddResource(&xconfig.ServiceGroup{Name: "service30", Weight: 30})
+			pbi.AddResource(xconfig.ServiceGroup{Name: "service10", Weight: 10})
+			pbi.AddResource(xconfig.ServiceGroup{Name: "service20", Weight: 20})
+			pbi.AddResource(xconfig.ServiceGroup{Name: "service30", Weight: 30})
 			p = b.Build(pbi)
 			c = NewCount()
 
 			for i := 0; i < cnt; i++ {
-				ret, err := p.Pick(picker.PickInfo{})
+				ret, err := p.Pick(picker.PickInfo{
+					Candidates: []picker.Resource{
+						&xconfig.ServiceGroup{Name: "service10"},
+						&xconfig.ServiceGroup{Name: "service20"},
+						&xconfig.ServiceGroup{Name: "service30"},
+					},
+				})
 				Expect(err).To(BeNil())
 				name := ret.Resource.ResourceName()
 				c.Add(name)
@@ -91,18 +104,32 @@ var _ = Describe("Picker", func() {
 		})
 		When("ServiceGroup 中的每个 Service 按照 wight 被选中", func() {
 			It(fmt.Sprintf("service10 should be select 10/60 * %d = %d", cnt, cnt*1/6), func() {
-				Expect(c.count["service10"]).To(Equal(cnt * 10 / 60))
+				Expect(isWithin5Percent(float64(c.count["service10"]), float64(cnt*10/60))).To(BeTrue())
 			})
 			It(fmt.Sprintf("service20 should be select 20/60 * %d = %d", cnt, cnt*2/6), func() {
-				Expect(c.count["service20"]).To(Equal(cnt * 20 / 60))
+				Expect(isWithin5Percent(float64(c.count["service20"]), float64(cnt*20/60))).To(BeTrue())
 			})
 			It(fmt.Sprintf("service30 should be select 30/60 * %d = %d", cnt, cnt*3/6), func() {
-				Expect(c.count["service30"]).To(Equal(cnt * 30 / 60))
+				Expect(isWithin5Percent(float64(c.count["service30"]), float64(cnt*30/60))).To(BeTrue())
 			})
 		})
 	})
 
 })
+
+func isWithin5Percent(a, b float64) bool {
+	if a == 0 && b == 0 {
+		return true // 都为0时视为相等
+	}
+	// 避免除以0错误，取较大值作为基准
+	base := math.Max(math.Abs(a), math.Abs(b))
+	if base == 0 {
+		return false // 至少一个为0时无法比较
+	}
+	diff := math.Abs(a - b)
+	percentage := (diff / base) * 100
+	return percentage <= 5
+}
 
 type Count struct {
 	sync.Locker

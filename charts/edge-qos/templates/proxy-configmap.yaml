@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-qos-proxy
+  namespace: {{ .Release.Namespace }}
+data:
+  edge-qos-proxy.yaml: |
+    {{- .Values.edgeQosProxy.conf | toYaml | nindent 4 }}

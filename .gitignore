@@ -40,5 +40,5 @@ bin/
 .idea/
 *.swp
 
-model-mesh-msc.yaml
+edge-qos-controller.yaml
 tmp/
