@@ -16,12 +16,12 @@
 
 `Edgewize EdgeQ` 的架构图如下：
 
-![`Edgewize ModelMesh` Intro](docs/static/modelmesh-intro.png)
+![`Edgewize ModelMesh` Intro](docs/static/edgeQ-intro.png)
 
 
 ## 架构
 
-![`Edgewize ModelMesh` Arch](docs/static/modelmesh-arch.png)
+![`Edgewize ModelMesh` Arch](docs/static/edgeQ-arch.png)
 
 
 
@@ -35,7 +35,7 @@
 * ***EdgeQ-Broker***: 推理服务数据面，部署在集群中每个节点上并通过宿主机内核的各种能力提供可编程资源管理，如 TrafficQoS 等。
 
 ### Broker
-![`Edgewize ModelMesh` Arch](docs/static/modelmesh-arch-broker.png)
+![`Edgewize ModelMesh` Arch](docs/static/edgeQ-arch-broker.png)
 
 ## 特性
 
