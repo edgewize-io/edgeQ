@@ -1,0 +1,260 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.2
+  name: infermodelservices.apps.edgewize.io
+spec:
+  group: apps.edgewize.io
+  names:
+    kind: InferModelService
+    listKind: InferModelServiceList
+    plural: infermodelservices
+    singular: infermodelservice
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              brokerConfig:
+                properties:
+                  baseOptions:
+                    properties:
+                      logLevel:
+                        type: string
+                      profEnable:
+                        type: boolean
+                      profPathPrefix:
+                        type: string
+                    type: object
+                  broker:
+                    description: RPCServer is RPC server config.
+                    properties:
+                      addr:
+                        type: string
+                      dialTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      headerTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      idleConnTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      keepAlive:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      maxConnsPerHost:
+                        type: integer
+                      maxIdleConns:
+                        type: integer
+                      readTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      workPoolSize:
+                        type: integer
+                      writeTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                    type: object
+                  promMetrics:
+                    properties:
+                      addr:
+                        type: string
+                      remoteWriteURL:
+                        type: string
+                      scrapeInterval:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                    type: object
+                  queue:
+                    properties:
+                      size:
+                        type: integer
+                    type: object
+                  schedule:
+                    description: ServiceQueue 封装底层 ServingServer 并提供 ServiceQueue
+                      抽象，一个 ServiceQueue 可以设置对应的调度策略
+                    properties:
+                      enableFlowControl:
+                        type: boolean
+                      method:
+                        type: string
+                    type: object
+                  serviceGroups:
+                    items:
+                      description: ServiceGroup 表示一个服务组，服务组的资源分配基于权重，权重高的服务组可以获得更多的资源，具体调度策略由
+                        ServiceQueue 的 SchedulingMethod 决定
+                      properties:
+                        name:
+                          type: string
+                        reclaimable:
+                          description: reclaimable表示该queue在资源使用量超过该queue所应得的资源份额时，是否允许其他queue回收该queue使用超额的资源，默认值为true
+                          type: boolean
+                        weight:
+                          description: |-
+                            weight表示该ServiceQueue在集群资源划分中所占的相对比重
+                            该ServiceQueue应得资源总量为 (weight/total-weight) * total-resource。
+                            其中， total-weight表示所有的queue的weight总和，total-resource表示集群的资源总量。
+                            weight是一个软约束，取值范围为[1, 2^31-1]
+                          format: int32
+                          type: integer
+                      type: object
+                    type: array
+                type: object
+              hostPort:
+                format: int32
+                type: integer
+              proxyConfig:
+                properties:
+                  baseOptions:
+                    properties:
+                      logLevel:
+                        type: string
+                      profEnable:
+                        type: boolean
+                      profPathPrefix:
+                        type: string
+                    type: object
+                  proxy:
+                    description: RPCServer is RPC server config.
+                    properties:
+                      addr:
+                        type: string
+                      dialTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      headerTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      idleConnTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      keepAlive:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      maxConnsPerHost:
+                        type: integer
+                      maxIdleConns:
+                        type: integer
+                      readTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                      workPoolSize:
+                        type: integer
+                      writeTimeout:
+                        description: |-
+                          A Duration represents the elapsed time between two instants
+                          as an int64 nanosecond count. The representation limits the
+                          largest representable duration to approximately 290 years.
+                        format: int64
+                        type: integer
+                    type: object
+                  serviceGroup:
+                    description: ServiceGroup 表示一个服务组，服务组的资源分配基于权重，权重高的服务组可以获得更多的资源，具体调度策略由
+                      ServiceQueue 的 SchedulingMethod 决定
+                    properties:
+                      name:
+                        type: string
+                      reclaimable:
+                        description: reclaimable表示该queue在资源使用量超过该queue所应得的资源份额时，是否允许其他queue回收该queue使用超额的资源，默认值为true
+                        type: boolean
+                      weight:
+                        description: |-
+                          weight表示该ServiceQueue在集群资源划分中所占的相对比重
+                          该ServiceQueue应得资源总量为 (weight/total-weight) * total-resource。
+                          其中， total-weight表示所有的queue的weight总和，total-resource表示集群的资源总量。
+                          weight是一个软约束，取值范围为[1, 2^31-1]
+                        format: int32
+                        type: integer
+                    type: object
+                type: object
+            type: object
+          status:
+            properties:
+              serviceGroups:
+                additionalProperties:
+                  properties:
+                    client:
+                      type: string
+                    isUsed:
+                      type: boolean
+                    name:
+                      type: string
+                  type: object
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

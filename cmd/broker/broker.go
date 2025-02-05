@@ -21,7 +21,13 @@ import (
 	"log"
 )
 
+var Version string
+var BuildTime string
+
 func main() {
+	log.Printf("Current Version: %s", Version)
+	log.Printf("Build Time: %s", BuildTime)
+
 	cmd := app.NewAPIServerCommand()
 
 	if err := cmd.Execute(); err != nil {

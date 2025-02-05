@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-type PprofServer struct {
+type PProfServer struct {
 	*http.Server
 	Enable bool
 }
 
-func NewPprofSrv(enable bool) *PprofServer {
-	return &PprofServer{&http.Server{Addr: "0.0.0.0:6060", Handler: nil}, enable}
+func NewPProfSrv(enable bool) *PProfServer {
+	return &PProfServer{&http.Server{Addr: "0.0.0.0:6060", Handler: nil}, enable}
 }
 
-func (pp *PprofServer) Run() error {
+func (pp *PProfServer) Run() error {
 	if !pp.Enable {
 		return nil
 	}
@@ -30,7 +30,7 @@ func (pp *PprofServer) Run() error {
 	return nil
 }
 
-func (pp *PprofServer) Stop() {
+func (pp *PProfServer) Stop() {
 	if !pp.Enable {
 		return
 	}

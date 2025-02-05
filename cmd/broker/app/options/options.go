@@ -56,10 +56,8 @@ func (s *ServerRunOptions) Flags() (fss cliflag.NamedFlagSets) {
 	return fss
 }
 
-// const fakeInterface string = "FAKE"
-
 // NewServer creates an BrokerServer instance using given options
-func (s *ServerRunOptions) NewServer(stopCh <-chan struct{}) (*broker.Server, error) {
+func (s *ServerRunOptions) NewServer() (*broker.Server, error) {
 	brokerServer := &broker.Server{
 		Config: s.Config,
 	}

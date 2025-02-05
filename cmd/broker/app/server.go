@@ -100,6 +100,7 @@ func Run(s *options.ServerRunOptions, configCh <-chan config.Config, ctx context
 			cancelFunc()
 			return nil
 		case cfg := <-configCh:
+			klog.Infof("Broker Config updated: %+v", cfg)
 			ret, _ := yaml.Marshal(cfg)
 			fmt.Println(string(ret))
 			cancelFunc()
@@ -115,16 +116,15 @@ func Run(s *options.ServerRunOptions, configCh <-chan config.Config, ctx context
 			return err
 		}
 	}
-
 }
 
 func run(s *options.ServerRunOptions, ctx context.Context) error {
-	apiserver, err := s.NewServer(ctx.Done())
+	apiserver, err := s.NewServer()
 	if err != nil {
 		return err
 	}
 
-	err = apiserver.PrepareRun(ctx.Done())
+	err = apiserver.PrepareRun()
 	if err != nil {
 		klog.Errorf("Failed to prepare apiserver: %v", err)
 		return err

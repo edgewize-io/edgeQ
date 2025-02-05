@@ -4,78 +4,62 @@ import (
 	"context"
 	"fmt"
 	"github.com/edgewize/edgeQ/internal/proxy/config"
-	"github.com/edgewize/edgeQ/internal/proxy/holder"
-	proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
-	xgrpc "github.com/edgewize/edgeQ/pkg/transport/grpc"
-	"github.com/edgewize/edgeQ/pkg/utils"
+	he "github.com/edgewize/edgeQ/internal/proxy/endpoint/http"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc"
 	"k8s.io/klog/v2"
-	"net"
-	"sync"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type Server struct {
 	Config   *config.Config
-	listener net.Listener
-	Endpoint *grpc.Server //Broker grpc server
-	dispatch *Dispatch
-	holder   holder.Holder
-	done     <-chan struct{}
-	lock     sync.RWMutex
+	Endpoint *he.HttpProxyServer //Broker grpc server
 }
 
-func (s *Server) PrepareRun(ctx context.Context) (err error) {
-	s.done = ctx.Done()
-	s.Endpoint = xgrpc.NewServer(s.Config.ProxyServer)
-
-	if s.holder != nil {
-		s.holder.Cancel()
-	}
-	s.holder = holder.New(context.Background(), s.Config.Dispatch.Timeout)
-
-	s.dispatch, err = NewDispatch(s.Config.Dispatch, s.Config.ServiceGroup, s.holder)
+func (s *Server) PrepareRun() (err error) {
+	s.Endpoint, err = he.NewHttpProxyServer(s.Config)
 	if err != nil {
-		return err
+		return
 	}
 
 	if s.Endpoint == nil {
-		return fmt.Errorf("broker server is nil")
+		return fmt.Errorf("proxy server is nil")
 	}
-	proto.RegisterMSServiceServer(s.Endpoint, s)
 
 	return nil
 }
 
 func (s *Server) Run(ctx context.Context) (err error) {
 	klog.V(0).Infof("proxy components start")
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+
+	klog.V(0).Infof("Start listening on %s", s.Config.Proxy.Addr)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	eg, ctx := errgroup.WithContext(ctx)
+
 	go func() {
 		select {
 		case <-ctx.Done():
-			s.Endpoint.GracefulStop()
-		case <-s.done:
-			s.Endpoint.GracefulStop()
+			s.Endpoint.Stop()
 		}
 	}()
 
-	addr := s.Config.ProxyServer.Addr
-	klog.V(0).Infof("Start listening on %s", addr)
-
-	network, address := utils.ExtractNetAddress(addr)
-	if network != "tcp" {
-		return fmt.Errorf("unsupported protocol %s: %v", network, addr)
-	}
-
-	if s.listener, err = net.Listen(network, address); err != nil {
-		return fmt.Errorf("unable to listen: %w", err)
-	}
-
-	var eg errgroup.Group
 	eg.Go(func() error {
-		return s.dispatch.Run(ctx)
+		select {
+		case sig := <-signalChan:
+			klog.Infof("Received signal \"%v\", shutting down...", sig)
+			cancel()
+			return fmt.Errorf("received signal %s", sig)
+		case <-ctx.Done():
+			return ctx.Err()
+		}
 	})
+
 	eg.Go(func() error {
-		return s.Endpoint.Serve(s.listener)
+		return s.Endpoint.Start()
 	})
 
 	err = eg.Wait()

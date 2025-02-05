@@ -63,12 +63,10 @@ var (
 
 const (
 	// DefaultConfigurationName is the default name of configuration
-	defaultConfigurationName = "model-mesh-broker"
+	defaultConfigurationName = "edge-qos-broker"
 
 	// DefaultConfigurationPath the default location of the configuration file
-	defaultConfigurationPath = "/etc/model-mesh-broker"
-
-	defaultBrokerAddr = ":5100"
+	defaultConfigurationPath = "/etc/edge-qos-broker"
 )
 
 type config struct {
@@ -128,54 +126,38 @@ func defaultConfig() *config {
 // New config creates a default non-empty Config
 func New() *Config {
 	return &Config{
-		BaseOptions: &BaseConfig{
+		BaseOptions: BaseConfig{
 			LogLevel:       "info",
-			WhiteList:      []string{},
 			ProfEnable:     false,
-			TracerEnable:   false,
 			ProfPathPrefix: "debug",
-			BaseConfig:     "",
 		},
-		BrokerServer: &GRPCServer{
-			Addr:                 defaultBrokerAddr,
-			Timeout:              time.Second * 1,
-			IdleTimeout:          time.Second * 60,
-			MaxLifeTime:          time.Hour * 2,
-			ForceCloseWait:       time.Second * 20,
-			KeepAliveInterval:    time.Second * 60,
-			KeepAliveTimeout:     time.Second * 20,
-			MaxMessageSize:       1024 * 1024,
-			MaxConcurrentStreams: 1024,
+		Broker: MeshServer{
+			Addr:            fmt.Sprintf("%s:%s", "127.0.0.1", constants.DefaultBrokerContainerPort),
+			DialTimeout:     time.Second * 30,
+			KeepAlive:       time.Second * 30,
+			HeaderTimeout:   time.Second * 20,
+			IdleConnTimeout: time.Second * 120,
+			MaxIdleConns:    1000,
+			MaxConnsPerHost: 1000,
+			ReadTimeout:     time.Second * 30,
+			WriteTimeout:    time.Second * 30,
+			WorkPoolSize:    5,
 		},
-		Schedule: &Schedule{
-			Method: "RR",
+		Schedule: Schedule{
+			Method:            "WRR",
+			EnableFlowControl: true,
 		},
-		Queue: &Queue{
-			Size: 10,
+		Queue: Queue{
+			Size: 200,
 		},
-		Dispatch: &Dispatch{
-			PoolSize: 10,
-			Client: &GRPCClient{
-				Addr:    defaultBrokerAddr,
-				Timeout: time.Second * 5,
-			},
-			Queue: &Queue{
-				Size: 10,
-			},
-		},
-		ServiceGroups: []*ServiceGroup{
+		ServiceGroups: []ServiceGroup{
 			{
 				Name:        "default",
 				Reclaimable: true,
 				Weight:      100,
 			},
-			{
-				Name:        "default1",
-				Reclaimable: true,
-				Weight:      100,
-			},
 		},
-		PromMetrics: &PromMetrics{
+		PromMetrics: PromMetrics{
 			Addr:           fmt.Sprintf("0.0.0.0:%d", constants.DefaultMetricPort),
 			ScrapeInterval: constants.DefaultInterval,
 		},

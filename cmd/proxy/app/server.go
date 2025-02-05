@@ -21,12 +21,11 @@ import (
 	"fmt"
 	"github.com/edgewize/edgeQ/cmd/proxy/app/options"
 	"github.com/edgewize/edgeQ/internal/proxy/config"
-	"gopkg.in/yaml.v2"
-	"k8s.io/klog/v2"
-
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	cliflag "k8s.io/component-base/cli/flag"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 )
 
@@ -36,7 +35,6 @@ func NewAPIServerCommand() (cmd *cobra.Command) {
 	// Load configuration from file /etc/schedule/schedule.yaml
 	conf, err := config.TryLoadFromDisk()
 	if err == nil {
-		conf.LoadConfigFromEnv()
 		s = &options.ServerRunOptions{
 			Config: conf,
 		}
@@ -124,7 +122,7 @@ func run(s *options.ServerRunOptions, ctx context.Context) error {
 		return err
 	}
 
-	err = apiserver.PrepareRun(ctx)
+	err = apiserver.PrepareRun()
 	if err != nil {
 		klog.Errorf("Failed to prepare apiserver: %v", err)
 		return nil

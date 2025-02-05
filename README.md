@@ -25,7 +25,17 @@
 
 ## Getting Started
 
-To get started with `Edgewize EdgeQ`, refer to the [documentation](https://github.com/edgewize/edgeQ/modelmesh).
+Enable ip forward on Edge Node
+```
+$ sudo echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+$ sudo sysctl -p
+```
+
+Then check it:
+```
+$ sudo sysctl -p | grep ip_forward
+net.ipv4.ip_forward = 1
+```
 
 ## Community and Support
 

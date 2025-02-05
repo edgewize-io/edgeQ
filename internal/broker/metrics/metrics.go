@@ -38,51 +38,45 @@ var (
 		Help: "Total number of broker received requests",
 	}, []string{"pod", "container", "method", "service_group"})
 
-	BrokerSendRequestTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_send_request_total",
-		Help: "Total number of broker received requests",
+	BackendHandledRequestTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "broker_backend_handled_request_total",
+		Help: "Total number of backend handled requests",
 	}, []string{"pod", "container", "method", "service_group"})
 
-	BrokerSendResponseTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_send_response_total",
-		Help: "Total number of broker sending responses",
+	BrokerProcessingDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "broker_processing_duration_seconds",
+		Help:    "time taken to process requests in broker queues",
+		Buckets: []float64{0.1, 0.5, 1, 2, 5, 10, 30},
 	}, []string{"pod", "container", "method", "service_group"})
 
-	PickNilRequestFromQueueTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_pick_nil_request_from_queue_total",
-		Help: "total number of nil request picked",
-	}, []string{"pod", "container", "method", "service_group"})
-
-	DispatchRequestTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_dispatch_request_total",
-		Help: "total number of dispatched requests",
-	}, []string{"pod", "container", "method", "service_group"})
-
-	BrokerProcessingTimeTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_processing_time_total",
-		Help: "total processing milliseconds time when the requests are about to be sent to backend",
-	}, []string{"pod", "container", "method", "service_group"})
-
-	BackendProcessingTimeTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_backend_processing_time_total",
-		Help: "total processing milliseconds time when the responses returned from backend",
-	}, []string{"pod", "container", "method", "service_group"})
-
-	TransRequestProcessingTimeTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "broker_trans_request_processing_time_total",
-		Help: "total processing milliseconds time when the requests are pushed to dispatch queue",
+	BackendProcessingDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "broker_backend_processing_duration_seconds",
+		Help:    "time taken to process requests in backend servers",
+		Buckets: []float64{0.1, 0.5, 1, 2, 5, 10, 30},
 	}, []string{"pod", "container", "method", "service_group"})
 )
 
 func Register() {
 	DefaultRegisterer.MustRegister(BrokerReceivedRequestTotal)
-	DefaultRegisterer.MustRegister(BrokerSendRequestTotal)
-	DefaultRegisterer.MustRegister(BrokerSendResponseTotal)
-	DefaultRegisterer.MustRegister(PickNilRequestFromQueueTotal)
-	DefaultRegisterer.MustRegister(DispatchRequestTotal)
-	DefaultRegisterer.MustRegister(BrokerProcessingTimeTotal)
-	DefaultRegisterer.MustRegister(BackendProcessingTimeTotal)
-	DefaultRegisterer.MustRegister(TransRequestProcessingTimeTotal)
+	DefaultRegisterer.MustRegister(BackendHandledRequestTotal)
+	DefaultRegisterer.MustRegister(BrokerProcessingDuration)
+	DefaultRegisterer.MustRegister(BackendProcessingDuration)
+}
+
+func BrokerReceivedRequestTotalRecord(method string, serviceGroup string) {
+	BrokerReceivedRequestTotal.WithLabelValues(POD_NAME, CONTAINER_NAME, method, serviceGroup).Inc()
+}
+
+func BackendHandledRequestTotalRecord(method string, serviceGroup string) {
+	BackendHandledRequestTotal.WithLabelValues(POD_NAME, CONTAINER_NAME, method, serviceGroup).Inc()
+}
+
+func BrokerProcessingDurationRecord(method string, serviceGroup string, duration float64) {
+	BrokerProcessingDuration.WithLabelValues(POD_NAME, CONTAINER_NAME, method, serviceGroup).Observe(duration)
+}
+
+func BackendReceivedRequestTotalRecord(method string, serviceGroup string, duration float64) {
+	BackendProcessingDuration.WithLabelValues(POD_NAME, CONTAINER_NAME, method, serviceGroup).Observe(duration)
 }
 
 func (p *PromMetricsServer) Run() error {
@@ -102,7 +96,7 @@ func (p *PromMetricsServer) Stop() {
 	}
 }
 
-func NewPromMetricsSrv(cfg *config.PromMetrics) *PromMetricsServer {
+func NewPromMetricsSrv(cfg config.PromMetrics) *PromMetricsServer {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.HandlerFor(DefaultGatherer, promhttp.HandlerOpts{}))
 
