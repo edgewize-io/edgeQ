@@ -20,6 +20,17 @@ $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 
+CRD_OPTIONS ?= "crd:allowDangerousTypes=true"
+
+MANIFESTS="template/*"
+
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
+
+
 .PHONY: init
 # init env
 init:
@@ -53,13 +64,6 @@ proto:
 build:
 	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
 
-.PHONY: generate
-# generate
-generate:
-	go generate ./...
-
-
-.PHONY: generate
 # generate
 test: clean
 	#find . -type f -name '*_test.go' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs -I{} go test -v -vet=all -failfast -race {}
@@ -156,3 +160,31 @@ docker-buildx-broker-image: ## Build and push docker image for the broker for cr
 
 .PHONY: build-muti-architecture-images
 build-muti-architecture-images: docker-buildx-msc-image docker-buildx-proxy-image docker-buildx-broker-image
+
+# Generate manifests e.g. CRD, RBAC, etc.
+.PHONY: manifests
+manifests: controller-gen
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="github.com/edgewize-io/edgewize/pkg/apis/${MANIFESTS}" output:crd:artifacts:config=config/crd
+
+# Generate code
+.PHONY: generate
+generate: controller-gen
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt"  paths="./..."
+
+##@ Tools
+
+# Download controller-gen if necessary
+.PHONY: controller-gen
+controller-gen:
+ifeq (, $(shell which controller-gen))
+	@{ \
+	set -e ;\
+	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
+	cd $$CONTROLLER_GEN_TMP_DIR ;\
+	go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.11.1  ;\
+	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
+	}
+CONTROLLER_GEN=$(GOBIN)/controller-gen
+else
+CONTROLLER_GEN=$(shell which controller-gen)
+endif
