@@ -104,7 +104,7 @@ func GetEdgeProxyAddress() string {
 		proxyPort = constants.DefaultMetricsProxyPort
 	}
 
-	return fmt.Sprintf("https://%s:%s/push", nodeIP, proxyPort)
+	return fmt.Sprintf("https://%s:%s/api/v1/write", nodeIP, proxyPort)
 }
 
 func parsePrometheusResponse(reader io.Reader) ([]prompb.TimeSeries, error) {

@@ -63,13 +63,13 @@ var (
 
 const (
 	// DefaultConfigurationName is the default name of configuration
-	defaultConfigurationName = "model-mesh-broker"
+	defaultConfigurationName = "edge-qos-broker"
 
 	// DefaultConfigurationPath the default location of the configuration file
-	defaultConfigurationPath = "/etc/model-mesh-broker"
-
-	defaultBrokerAddr = ":5100"
+	defaultConfigurationPath = "/etc/edge-qos-broker"
 )
+
+var defaultBrokerAddr = fmt.Sprintf("0.0.0.0:%s", constants.DefaultBrokerContainerPort)
 
 type config struct {
 	cfg         *Config
@@ -144,11 +144,11 @@ func New() *Config {
 			ForceCloseWait:       time.Second * 20,
 			KeepAliveInterval:    time.Second * 60,
 			KeepAliveTimeout:     time.Second * 20,
-			MaxMessageSize:       1024 * 1024,
+			MaxMessageSize:       102428800,
 			MaxConcurrentStreams: 1024,
 		},
 		Schedule: &Schedule{
-			Method: "RR",
+			Method: "WRR",
 		},
 		Queue: &Queue{
 			Size: 10,

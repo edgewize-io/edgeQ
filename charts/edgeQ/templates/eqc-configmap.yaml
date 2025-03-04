@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-qos-controller
+  namespace: {{ .Release.Namespace }}
+data:
+  edge-qos-controller.yaml: |
+    namespace: {{ .Release.Namespace }}
+    webhookServiceName: {{ include "edge-qos-controller.fullname" . }}
+    webhookPort: 8444
+    proxySidecar:
+      initContainers:
+        - name: init-iptables
+          image: "{{ template "init-iptables.image" . }}"
+          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
+          securityContext:
+            capabilities:
+              add: [ "NET_ADMIN" ]  # 授予网络权限
+      containers:
+        - name: edge-qos-proxy
+          image: "{{ template "edge-qos-proxy.image" . }}"
+          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+          volumeMounts:
+            - name: proxy-config
+              mountPath: /etc/edge-qos-proxy
+      volumes:
+        - name: proxy-config
+          configMap:
+            name:  edge-qos-proxy
+
+    brokerSidecar:
+      initContainers:
+        - name: init-iptables
+          image: "{{ template "init-iptables.image" . }}"
+          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
+          securityContext:
+            capabilities:
+              add: [ "NET_ADMIN" ]  # 授予网络权限
+      containers:
+        - name: edge-qos-broker
+          image: "{{ template "edge-qos-broker.image" . }}"
+          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
+          env:
+            - name: CONTAINER_NAME
+              value: "broker"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: broker-config
+              mountPath: /etc/edge-qos-broker
+      volumes:
+        - name: broker-config
+          configMap:
+            name: edge-qos-broker

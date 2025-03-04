@@ -7,14 +7,14 @@ base:
   endpoints: [ ]
   baseconfig: ""
 brokerServer:
-  addr: :8010
+  addr: :15050
   timeout: 3s
   idletimeout: 1m0s
   maxlifetime: 2h0m0s
   forceclosewait: 20s
   keepaliveinterval: 1m0s
   keepalivetimeout: 20s
-  maxmessagesize: 1048576
+  maxmessagesize: 102428800
   maxconcurrentstreams: 1024
   enableopentracing: false
 schedule:

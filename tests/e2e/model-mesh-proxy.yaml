@@ -14,14 +14,14 @@ proxyServer:
   forceclosewait: 20s
   keepaliveinterval: 1m0s
   keepalivetimeout: 20s
-  maxmessagesize: 1048576
+  maxmessagesize: 102428800
   maxconcurrentstreams: 1024
   enableopentracing: false
 dispatch:
   queue:
     size: 10
   client:
-    addr: 127.0.0.1:8010
+    addr: 127.0.0.1:15050
     timeout: 5s
 serviceGroup:
   name: pay-service

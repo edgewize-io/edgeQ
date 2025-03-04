@@ -5,9 +5,9 @@ import (
 	"context"
 	"fmt"
 	apiserverconfig "github.com/edgewize/edgeQ/pkg/apiserver/config"
+	edgedeployv1alpha1 "github.com/edgewize/edgeQ/pkg/kapis/apps/v1alpha1"
 	"github.com/edgewize/edgeQ/pkg/utils"
-	"github.com/emicklei/go-restful/v3"
-	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"github.com/emicklei/go-restful"
 	urlruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
 	"k8s.io/client-go/rest"
@@ -49,7 +49,6 @@ func (s *APIServer) PrepareRun(stopCh <-chan struct{}) error {
 	})
 
 	s.installKubeSphereAPIs(stopCh)
-	s.installCRDAPIs()
 
 	for _, ws := range s.container.RegisteredWebServices() {
 		klog.Infof("Register %s", ws.RootPath())
@@ -67,15 +66,7 @@ func (s *APIServer) PrepareRun(stopCh <-chan struct{}) error {
 //
 //	any attempt to list objects using listers will get empty results.
 func (s *APIServer) installKubeSphereAPIs(stopCh <-chan struct{}) {
-	urlruntime.Must(edgeclusterv1alpha1.AddToContainer(s.container, s.Config, s.RuntimeClient, s.RuntimeCache, s.K8sClient, s.K8sClient.Discovery(), s.KubeSphereClient))
-	urlruntime.Must(edgeappsetv1alpha1.AddToContainer(s.container, s.RuntimeClient, s.RuntimeCache))
-}
-
-// installCRDAPIs Install CRDs to the KAPIs with List and Get options
-func (s *APIServer) installCRDAPIs() {
-	crds := &extv1.CustomResourceDefinitionList{}
-	// TODO Maybe we need a better label name
-	urlruntime.Must(s.RuntimeClient.List(context.TODO(), crds, runtimeclient.MatchingLabels{"kubesphere.io/resource-served": "true"}))
+	urlruntime.Must(edgedeployv1alpha1.AddToContainer(s.container, s.RuntimeCache, s.RuntimeClient))
 }
 
 func (s *APIServer) Run(ctx context.Context) (err error) {

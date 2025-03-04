@@ -3,16 +3,19 @@ package options
 import (
 	"crypto/tls"
 	"fmt"
+	appsv1alpha1 "github.com/edgewize/edgeQ/pkg/apis/apps/v1alpha1"
 	"github.com/edgewize/edgeQ/pkg/apiserver"
 	apiserverconfig "github.com/edgewize/edgeQ/pkg/apiserver/config"
 	genericoptions "github.com/edgewize/edgeQ/pkg/server/options"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	"net/http"
 	runtimecache "sigs.k8s.io/controller-runtime/pkg/cache"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+	kconfig "sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sync"
 )
 
@@ -51,7 +54,7 @@ func (s *ServerRunOptions) NewAPIServer(stopCh <-chan struct{}) (*apiserver.APIS
 	sch := runtime.NewScheme()
 	s.SchemeOnce.Do(func() {
 		_ = corev1.AddToScheme(sch)
-		
+		_ = appsv1alpha1.AddToScheme(sch)
 	})
 
 	server := &http.Server{
@@ -70,9 +73,19 @@ func (s *ServerRunOptions) NewAPIServer(stopCh <-chan struct{}) (*apiserver.APIS
 		server.Addr = fmt.Sprintf(":%d", s.GenericServerRunOptions.SecurePort)
 	}
 
-	mapper, err := apiutil.NewDynamicRESTMapper(k8sConfig)
+	k8sConfig, err := kconfig.GetConfig()
 	if err != nil {
-		klog.Fatalf("unable to create RESTMapper: %v", err)
+		return nil, fmt.Errorf("failed to get kubeconfig, %s", err)
+	}
+
+	restClient, err := rest.HTTPClientFor(k8sConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create rest client, %s", err)
+	}
+
+	mapper, err := apiutil.NewDynamicRESTMapper(k8sConfig, restClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create dynamic rest mapper, %s", err)
 	}
 
 	apiServer.RuntimeCache, err = runtimecache.New(k8sConfig, runtimecache.Options{Scheme: sch, Mapper: mapper})
@@ -84,15 +97,6 @@ func (s *ServerRunOptions) NewAPIServer(stopCh <-chan struct{}) (*apiserver.APIS
 	if err != nil {
 		klog.Fatalf("unable to create controller runtime client: %v", err)
 	}
-
-	if s.KubesphereOptions != nil && s.KubesphereOptions.Host != "" && s.InHostCluster() {
-		restclient, err := kubesphere.NewClient(s.KubesphereOptions)
-		if err != nil {
-			return nil, fmt.Errorf("failed to init kubesphere client: %v", err)
-		}
-		apiServer.KubeSphereClient = *restclient
-	}
-
 	apiServer.Server = server
 
 	return apiServer, nil

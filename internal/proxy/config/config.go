@@ -17,8 +17,8 @@ limitations under the License.
 package config
 
 import (
+	"fmt"
 	"github.com/edgewize/edgeQ/pkg/constants"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -63,13 +63,13 @@ var (
 
 const (
 	// DefaultConfigurationName is the default name of configuration
-	defaultConfigurationName = "model-mesh-proxy"
+	defaultConfigurationName = "edge-qos-proxy"
 
 	// DefaultConfigurationPath the default location of the configuration file
-	defaultConfigurationPath = "/etc/model-mesh-proxy"
-
-	defaultBrokerAddr = ":5100"
+	defaultConfigurationPath = "/etc/edge-qos-proxy"
 )
+
+var defaultProxyAddr = fmt.Sprintf("0.0.0.0:%s", constants.DefaultProxyContainerPort)
 
 type config struct {
 	cfg         *Config
@@ -137,20 +137,20 @@ func New() *Config {
 			BaseConfig:     "",
 		},
 		ProxyServer: &GRPCServer{
-			Addr:                 defaultBrokerAddr,
+			Addr:                 defaultProxyAddr,
 			Timeout:              time.Second * 1,
 			IdleTimeout:          time.Second * 60,
 			MaxLifeTime:          time.Hour * 2,
 			ForceCloseWait:       time.Second * 20,
 			KeepAliveInterval:    time.Second * 60,
 			KeepAliveTimeout:     time.Second * 20,
-			MaxMessageSize:       1024 * 1024,
+			MaxMessageSize:       102428800,
 			MaxConcurrentStreams: 1024,
 		},
 		Dispatch: &Dispatch{
 			Timeout: time.Second * 10,
 			Client: &GRPCClient{
-				Addr:    defaultBrokerAddr,
+				Addr:    defaultProxyAddr,
 				Timeout: time.Second * 5,
 			},
 			Queue: &Queue{
@@ -169,24 +169,4 @@ func TryLoadFromDisk() (*Config, error) {
 // WatchConfigChange return config change channel
 func WatchConfigChange() <-chan Config {
 	return _config.watchConfig()
-}
-
-func (proxyCfg *Config) LoadConfigFromEnv() {
-	if proxyCfg == nil {
-		return
-	}
-
-	proxyServiceGroup := os.Getenv(constants.ProxyServiceGroupEnv)
-	if proxyServiceGroup == "" {
-		proxyServiceGroup = constants.DefaultServiceGroup
-	}
-
-	proxyCfg.ServiceGroup = &ServiceGroup{
-		Name: proxyServiceGroup,
-	}
-
-	serverBrokerEndpoint := os.Getenv(constants.ServerBrokerEndpointEnv)
-	if proxyCfg.Dispatch != nil && proxyCfg.Dispatch.Client != nil {
-		proxyCfg.Dispatch.Client.Addr = serverBrokerEndpoint
-	}
 }

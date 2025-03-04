@@ -71,4 +71,5 @@ type Dispatch struct {
 type PromMetrics struct {
 	Addr           string        `yaml:"addr,omitempty" json:"addr,omitempty" mapstructure:"addr"`
 	ScrapeInterval time.Duration `yaml:"scrapeInterval,omitempty" json:"scrapeInterval,omitempty" mapstructure:"scrapeInterval"`
+	RemoteWriteURL string        `yaml:"remoteWriteURL,omitempty" json:"remoteWriteURL,omitempty" mapstructure:"remoteWriteURL"`
 }

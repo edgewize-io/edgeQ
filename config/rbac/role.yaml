@@ -1,0 +1,62 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: edge-qos-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+- resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+- resources:
+  - deployments/status
+  verbs:
+  - get
+- apiGroups:
+  - apps.edgewize.io
+  resources:
+  - infermodeldeployments
+  - infermodelservices
+  - infermodeltemplates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps.edgewize.io
+  resources:
+  - infermodeldeployments/finalizers
+  - infermodelservices/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - apps.edgewize.io
+  resources:
+  - infermodeldeployments/status
+  - infermodelservices/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - apps.edgewize.io
+  resources:
+  - infermodeltemplateversions
+  verbs:
+  - delete
+  - get
+  - list
+  - watch

@@ -1,8 +1,0 @@
-replicaCount: 1
-
-imagePullSecrets: ""
-
-image:
-  repository: tkeelio/tkeel-hello
-  tag: 0.3.0
-  pullPolicy: Always

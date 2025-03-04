@@ -100,6 +100,7 @@ func Run(s *options.ServerRunOptions, configCh <-chan config.Config, ctx context
 			cancelFunc()
 			return nil
 		case cfg := <-configCh:
+			klog.Infof("Broker Config updated: %+v", cfg)
 			ret, _ := yaml.Marshal(cfg)
 			fmt.Println(string(ret))
 			cancelFunc()

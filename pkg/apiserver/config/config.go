@@ -70,7 +70,7 @@ func getDefaultConfigUpdater() *configUpdater {
 	viper.AddConfigPath(".")
 
 	// Load from Environment variables
-	viper.SetEnvPrefix("kubesphere")
+	viper.SetEnvPrefix("edgeQ")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 

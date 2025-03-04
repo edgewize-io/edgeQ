@@ -90,7 +90,7 @@ var _ = Describe("E2E test", func() {
 			}
 			for i := 0; i < len(serviceGroups); i++ {
 				conf := deepcopy.Copy[*proxyconfig.Config](proxyOrigConf)
-				conf.ProxyServer.Addr = fmt.Sprintf("127.0.0.1:%d", 8080+i)
+				conf.ProxyServer.Addr = fmt.Sprintf("0.0.0.0:%d", 8080+i)
 				conf.ServiceGroup = serviceGroups[i]
 				proxyOpts = append(proxyOpts, &proxyoptions.ServerRunOptions{Config: conf})
 			}

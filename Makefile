@@ -1,3 +1,5 @@
+include Makefile.tools.mk
+
 GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
 INTERNAL_PROTO_FILES=$(shell find internal -name *.proto)
@@ -7,22 +9,19 @@ DRY_RUN=${DRY_RUN:-}
 REPO ?= kubesphere
 TAG ?= latest
 
-PROXY_IMAGE ?= $(REPO)/model-mesh-proxy:$(TAG)
-BROKER_IMAGE ?= $(REPO)/model-mesh-broker:$(TAG)
-MSC_IMAGE ?= $(REPO)/model-mesh-msc:$(TAG)
+PROXY_IMAGE ?= $(REPO)/edge-qos-proxy:$(TAG)
+BROKER_IMAGE ?= $(REPO)/edge-qos-broker:$(TAG)
+MSC_IMAGE ?= $(REPO)/edge-qos-controller:$(TAG)
 
-CONTROLLER_TOOLS_VERSION ?= v0.13.0
 PLATFORMS ?= linux/arm64,linux/amd64
 
-## Location to install dependencies to
-LOCALBIN ?= $(shell pwd)/bin
-$(LOCALBIN):
-	mkdir -p $(LOCALBIN)
-CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 
 CRD_OPTIONS ?= "crd:allowDangerousTypes=true"
 
-MANIFESTS="template/*"
+MANIFESTS ?= "apps/*"
+
+MANIFESTS_PATH ?= "github.com/edgewize/pkg/apis"
+GV="apps:v1alpha1"
 
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -161,30 +160,17 @@ docker-buildx-broker-image: ## Build and push docker image for the broker for cr
 .PHONY: build-muti-architecture-images
 build-muti-architecture-images: docker-buildx-msc-image docker-buildx-proxy-image docker-buildx-broker-image
 
+
 # Generate manifests e.g. CRD, RBAC, etc.
 .PHONY: manifests
 manifests: controller-gen
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="github.com/edgewize-io/edgewize/pkg/apis/${MANIFESTS}" output:crd:artifacts:config=config/crd
+	@$(CONTROLLER_GEN) $(CRD_OPTIONS) paths=./pkg/apis/apps/... output:crd:dir=config/crds
+	@$(CONTROLLER_GEN) rbac:roleName=edge-qos-role paths="./..." output:rbac:artifacts:config=config/rbac
+	@$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths=./pkg/apis/apps/v1alpha1
 
-# Generate code
+	@cp config/crds/* charts/edgeQ/crds/
+
 .PHONY: generate
 generate: controller-gen
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt"  paths="./..."
+	hack/update-codegen.sh
 
-##@ Tools
-
-# Download controller-gen if necessary
-.PHONY: controller-gen
-controller-gen:
-ifeq (, $(shell which controller-gen))
-	@{ \
-	set -e ;\
-	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
-	cd $$CONTROLLER_GEN_TMP_DIR ;\
-	go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.11.1  ;\
-	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
-	}
-CONTROLLER_GEN=$(GOBIN)/controller-gen
-else
-CONTROLLER_GEN=$(shell which controller-gen)
-endif
