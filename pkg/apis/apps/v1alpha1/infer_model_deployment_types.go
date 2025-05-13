@@ -15,11 +15,11 @@ type ModelNodeSelector struct {
 }
 
 type InnerDeploymentTemplate struct {
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Specification of the desired behavior of the Deployment.
 	// +optional
-	Spec ModelDeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	Spec ModelDeploymentSpec `json:"spec,omitempty"`
 }
 
 type InferModelDeploymentSpec struct {

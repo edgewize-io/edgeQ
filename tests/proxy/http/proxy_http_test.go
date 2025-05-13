@@ -1,10 +1,12 @@
-package app
+package http
 
 import (
+	"context"
 	"fmt"
 	proxyCfg "github.com/edgewize/edgeQ/internal/proxy/config"
-	ps "github.com/edgewize/edgeQ/internal/proxy/endpoint/http"
+	pe "github.com/edgewize/edgeQ/internal/proxy/endpoint"
 	"github.com/edgewize/edgeQ/pkg/constants"
+	"github.com/edgewize/edgeQ/pkg/endpoint"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"io"
@@ -12,12 +14,13 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"time"
 )
 
 var _ = Describe("ReverseProxy", func() {
 	var (
 		backendServer *httptest.Server
-		proxyServer   *ps.HttpProxyServer
+		proxyServer   endpoint.QosEndpoint
 	)
 
 	BeforeEach(func() {
@@ -43,19 +46,21 @@ var _ = Describe("ReverseProxy", func() {
 		}
 
 		proxyConf := proxyCfg.New()
-		proxyServer, err = ps.NewHttpProxyServer(proxyConf)
+		proxyConf.Proxy.Type = constants.HTTPEndpoint
+		proxyServer, err = pe.GetProxyEndpoint(proxyConf)
 		if err != nil {
 			Fail(fmt.Sprintf("创建 proxy 服务器失败 %v", err))
 		}
 
 		go func() {
-			_ = proxyServer.Start()
+			_ = proxyServer.Start(context.Background())
 		}()
 	})
 
 	AfterEach(func() {
 		backendServer.Close()
 		proxyServer.Stop()
+		time.Sleep(time.Second * 3)
 	})
 
 	Context("正常请求场景", func() {

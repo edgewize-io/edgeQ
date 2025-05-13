@@ -122,14 +122,30 @@ edgeQosProxy:
       profEnable: false
     proxy:
       addr: 0.0.0.0:15051
-      dialTimeout: 30s
-      keepAlive: 1m0s
-      headerTimeout: 1m0s
-      idleConnTimeout: 1m0s
-      maxIdleConns: 1000
-      MaxConnsPerHost: 1000
-      readTimeout: 1m0s
-      writeTimeout: 1m0s
+      type: http
+      http:
+        dialTimeout: 30s
+        keepAlive: 1m0s
+        headerTimeout: 1m0s
+        idleConnTimeout: 1m0s
+        maxIdleConns: 1000
+        maxConnsPerHost: 1000
+        readTimeout: 1m0s
+        writeTimeout: 1m0s
+      grpc:
+        dialTimeout: 30s
+        backoffMaxDelay: 30s
+        keepAlive: 600s
+        keepAliveTimeout: 30s
+        requestIdleTime: 120s
+        requestMaxLife: 300s
+        acquireConnTimeout: 120s
+        reuseConnection: true
+        connectionNum: 10
+        initialWindowSize: 1073741824
+        initialConnWindowSize: 1073741824
+        maxSendMsgSize: 4294967296
+        maxRecvMsgSize: 4294967296
     serviceGroup:
       name: pay
 
@@ -143,15 +159,31 @@ edgeQosBroker:
       logLevel: info
       profEnable: false
     broker:
+      type: http
       addr: 0.0.0.0:15050
-      dialTimeout: 30s
-      keepAlive: 1m0s
-      headerTimeout: 1m0s
-      idleConnTimeout: 1m0s
-      maxIdleConns: 1000
-      MaxConnsPerHost: 1000
-      readTimeout: 1m0s
-      writeTimeout: 1m0s
+      http:
+        dialTimeout: 30s
+        keepAlive: 1m0s
+        headerTimeout: 1m0s
+        idleConnTimeout: 1m0s
+        maxIdleConns: 1000
+        maxConnsPerHost: 1000
+        readTimeout: 1m0s
+        writeTimeout: 1m0s
+      grpc:
+        dialTimeout: 30s
+        backoffMaxDelay: 30s
+        keepAlive: 600s
+        keepAliveTimeout: 30s
+        requestIdleTime: 120s
+        requestMaxLife: 300s
+        acquireConnTimeout: 120s
+        reuseConnection: true
+        connectionNum: 10
+        initialWindowSize: 1073741824
+        initialConnWindowSize: 1073741824
+        maxSendMsgSize: 4294967296
+        maxRecvMsgSize: 4294967296
       workPoolSize: 5
     schedule:
       method: WRR
@@ -165,3 +197,5 @@ edgeQosBroker:
         weight: 20
       - name: security
         weight: 400
+
+kubeSphereExtensionEnabled: true

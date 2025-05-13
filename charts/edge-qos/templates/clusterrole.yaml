@@ -1,7 +1,7 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: edge-qos
+  name: {{ include "edge-qos.fullname" . }}
   labels:
     {{- include "edge-qos-controller.labels" . | nindent 4 }}
 rules:

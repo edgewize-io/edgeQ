@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/edgewize/edgeQ/internal/proxy/config"
-	he "github.com/edgewize/edgeQ/internal/proxy/endpoint/http"
+	pe "github.com/edgewize/edgeQ/internal/proxy/endpoint"
+	"github.com/edgewize/edgeQ/pkg/endpoint"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/klog/v2"
 	"os"
@@ -14,11 +15,11 @@ import (
 
 type Server struct {
 	Config   *config.Config
-	Endpoint *he.HttpProxyServer //Broker grpc server
+	Endpoint endpoint.QosEndpoint
 }
 
 func (s *Server) PrepareRun() (err error) {
-	s.Endpoint, err = he.NewHttpProxyServer(s.Config)
+	s.Endpoint, err = pe.GetProxyEndpoint(s.Config)
 	if err != nil {
 		return
 	}
@@ -59,7 +60,7 @@ func (s *Server) Run(ctx context.Context) (err error) {
 	})
 
 	eg.Go(func() error {
-		return s.Endpoint.Start()
+		return s.Endpoint.Start(ctx)
 	})
 
 	err = eg.Wait()

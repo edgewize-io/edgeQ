@@ -18,7 +18,7 @@ type HttpProxyServer struct {
 	Addr  string
 }
 
-func (h *HttpProxyServer) Start() (err error) {
+func (h *HttpProxyServer) Start(_ context.Context) (err error) {
 	klog.Infof("Proxy server listening on %s", h.Addr)
 	return h.Proxy.ListenAndServe()
 }
@@ -53,13 +53,13 @@ func NewHttpProxyServer(cfg *proxyCfg.Config) (*HttpProxyServer, error) {
 	reverseProxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout:   cfg.Proxy.DialTimeout, // TCP 连接超时
-			KeepAlive: cfg.Proxy.KeepAlive,   // 保持长连接时间
+			Timeout:   cfg.Proxy.HTTP.DialTimeout, // TCP 连接超时
+			KeepAlive: cfg.Proxy.HTTP.KeepAlive,   // 保持长连接时间
 		}).DialContext,
-		ResponseHeaderTimeout: cfg.Proxy.HeaderTimeout,
-		IdleConnTimeout:       cfg.Proxy.IdleConnTimeout,
-		MaxIdleConns:          cfg.Proxy.MaxIdleConns,
-		MaxConnsPerHost:       cfg.Proxy.MaxConnsPerHost,
+		ResponseHeaderTimeout: cfg.Proxy.HTTP.HeaderTimeout,
+		IdleConnTimeout:       cfg.Proxy.HTTP.IdleConnTimeout,
+		MaxIdleConns:          cfg.Proxy.HTTP.MaxIdleConns,
+		MaxConnsPerHost:       cfg.Proxy.HTTP.MaxConnsPerHost,
 	}
 
 	reverseProxy.Rewrite = func(request *httputil.ProxyRequest) {
@@ -76,10 +76,10 @@ func NewHttpProxyServer(cfg *proxyCfg.Config) (*HttpProxyServer, error) {
 	proxyServer := &http.Server{
 		Addr:              cfg.Proxy.Addr,
 		Handler:           reverseProxy,
-		ReadTimeout:       cfg.Proxy.ReadTimeout,
-		WriteTimeout:      cfg.Proxy.WriteTimeout,
-		ReadHeaderTimeout: cfg.Proxy.HeaderTimeout,
-		IdleTimeout:       cfg.Proxy.IdleConnTimeout,
+		ReadTimeout:       cfg.Proxy.HTTP.ReadTimeout,
+		WriteTimeout:      cfg.Proxy.HTTP.WriteTimeout,
+		ReadHeaderTimeout: cfg.Proxy.HTTP.HeaderTimeout,
+		IdleTimeout:       cfg.Proxy.HTTP.IdleConnTimeout,
 	}
 
 	return &HttpProxyServer{

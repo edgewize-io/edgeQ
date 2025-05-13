@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "./;proxy";
+
+message DataChunk {
+  bytes content = 1;
+}
+
+service BackendService {
+  rpc BidirectionalStream(stream DataChunk) returns (stream DataChunk);
+}

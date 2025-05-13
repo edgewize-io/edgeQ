@@ -28,13 +28,13 @@ type ModelServerSpec struct {
 }
 
 type ModelDeploymentSpec struct {
-	Replicas *int32 `json:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
+	Replicas *int32 `json:"replicas,omitempty"`
 	// Template describes the pods that will be created.
-	Template v1.PodTemplateSpec `json:"template" protobuf:"bytes,3,opt,name=template"`
+	Template v1.PodTemplateSpec `json:"template"`
 	// The deployment strategy to use to replace existing pods with new ones.
 	// +optional
 	// +patchStrategy=retainKeys
-	Strategy appsv1.DeploymentStrategy `json:"strategy,omitempty" patchStrategy:"retainKeys" protobuf:"bytes,4,opt,name=strategy"`
+	Strategy appsv1.DeploymentStrategy `json:"strategy,omitempty" patchStrategy:"retainKeys"`
 }
 
 type ServableConfigs struct {
@@ -70,6 +70,7 @@ type InferModelTemplateVersionStatus struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:openapi-gen=true
 // +genclient:nonNamespaced
+// +kubebuilder:object:root=true
 // +kubebuilder:resource:scope=Cluster
 
 // InferModelTemplateVersion is the schema for the InferModelTemplates API

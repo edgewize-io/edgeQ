@@ -1,31 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: edge-qos-test-client
+  name: chatgpt-next-web
   namespace: project-wuhan
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: edge-qos-test-client
+      app: chatgpt-next-web
   template:
     metadata:
       labels:
-        app: edge-qos-test-client
+        app: chatgpt-next-web
         "proxy.edge-qos.edgewize.io/injection": "enabled"
-        "server.edge-qos.edgewize.io/name": "nginx-backend-nng-wuhan-edgenode-xe3u"
+        "server.edge-qos.edgewize.io/name": "nginx-backend-nng-wuhan-2060-gpu"
         "server.edge-qos.edgewize.io/namespace": "project-wuhan"
-        "client.edge-qos.edgewize.io/servicegroup": "security"
+        "client.edge-qos.edgewize.io/servicegroup": "a"
     spec:
+      imagePullSecrets:
+        - name: edge-deploy-secret
       containers:
         - name: test-client
-          image: mirrors.thingsdao.com/edgewize/init-iptables:latest
+          image: mirrors.thingsdao.com/edgewize/chatgpt-next-web:latest
           imagePullPolicy: IfNotPresent
-          command:
-            - sleep
-            - "10000"
+          ports:
+            - containerPort: 3000
+              hostPort: 32100
       nodeSelector:
-        kubernetes.io/hostname: edgenode-xe3u
+        kubernetes.io/hostname: 2060-gpu
       tolerations:
         - key: node-role.kubernetes.io/edge
           operator: Exists

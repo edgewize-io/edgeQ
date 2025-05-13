@@ -24,7 +24,7 @@ type HttpBrokerServer struct {
 	QueuePool         *queue.QueuePool
 	Addr              string
 	Scheduler         *sch.Scheduler
-	Method            string
+	ScheduleMethod    string
 	WorkPool          chan struct{}
 	stopChan          chan struct{}
 	EnableFlowControl bool
@@ -60,21 +60,21 @@ func NewHttpBrokerServer(cfg *brokerCfg.Config) (*HttpBrokerServer, error) {
 	reverseProxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout:   cfg.Broker.DialTimeout, // TCP 连接超时
-			KeepAlive: cfg.Broker.KeepAlive,   // 保持长连接时间
+			Timeout:   cfg.Broker.HTTP.DialTimeout, // TCP 连接超时
+			KeepAlive: cfg.Broker.HTTP.KeepAlive,   // 保持长连接时间
 		}).DialContext,
-		ResponseHeaderTimeout: cfg.Broker.HeaderTimeout,
-		IdleConnTimeout:       cfg.Broker.IdleConnTimeout,
-		MaxIdleConns:          cfg.Broker.MaxIdleConns,
-		MaxConnsPerHost:       cfg.Broker.MaxConnsPerHost,
+		ResponseHeaderTimeout: cfg.Broker.HTTP.HeaderTimeout,
+		IdleConnTimeout:       cfg.Broker.HTTP.IdleConnTimeout,
+		MaxIdleConns:          cfg.Broker.HTTP.MaxIdleConns,
+		MaxConnsPerHost:       cfg.Broker.HTTP.MaxConnsPerHost,
 	}
 
 	server := &http.Server{
 		Addr:              cfg.Broker.Addr,
-		ReadTimeout:       cfg.Broker.ReadTimeout,
-		WriteTimeout:      cfg.Broker.WriteTimeout,
-		ReadHeaderTimeout: cfg.Broker.HeaderTimeout,
-		IdleTimeout:       cfg.Broker.IdleConnTimeout,
+		ReadTimeout:       cfg.Broker.HTTP.ReadTimeout,
+		WriteTimeout:      cfg.Broker.HTTP.WriteTimeout,
+		ReadHeaderTimeout: cfg.Broker.HTTP.HeaderTimeout,
+		IdleTimeout:       cfg.Broker.HTTP.IdleConnTimeout,
 	}
 
 	reverseProxy.ErrorHandler = func(w http.ResponseWriter, request *http.Request, e error) {
@@ -101,7 +101,7 @@ func NewHttpBrokerServer(cfg *brokerCfg.Config) (*HttpBrokerServer, error) {
 		WorkPool:          make(chan struct{}, cfg.Broker.WorkPoolSize),
 		stopChan:          make(chan struct{}),
 		EnableFlowControl: cfg.Schedule.EnableFlowControl,
-		Method:            cfg.Schedule.Method,
+		ScheduleMethod:    cfg.Schedule.Method,
 	}, nil
 }
 
@@ -115,7 +115,12 @@ func (s *HttpBrokerServer) Start(ctx context.Context) error {
 	} else {
 		s.Broker.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("收到请求\n")
-			waitChan := s.EnqueueRequests(w, r)
+			waitChan, err := s.EnqueueRequests(w, r)
+			if err != nil {
+				fmt.Printf("请求入队报错，%v\n", err)
+				return
+			}
+
 			<-waitChan
 			fmt.Printf("请求执行完毕，返回\n")
 		})
@@ -131,14 +136,14 @@ func (s *HttpBrokerServer) Stop() {
 	_ = s.Broker.Shutdown(context.Background())
 }
 
-func (s *HttpBrokerServer) EnqueueRequests(w http.ResponseWriter, r *http.Request) (waitChan chan struct{}) {
+func (s *HttpBrokerServer) EnqueueRequests(w http.ResponseWriter, r *http.Request) (waitChan chan struct{}, err error) {
 	serviceGroup := r.Header.Get(constants.ServiceGroupHeader)
 	if serviceGroup == "" {
 		serviceGroup = constants.DefaultServiceGroup
 	}
 
 	waitChan = make(chan struct{})
-	reqItem := &queue.HttpRequestItem{
+	reqItem := &queue.HTTPRequestItem{
 		ServiceGroup: serviceGroup,
 		Req:          r,
 		Writer:       w,
@@ -147,13 +152,13 @@ func (s *HttpBrokerServer) EnqueueRequests(w http.ResponseWriter, r *http.Reques
 		WaitChan:     waitChan,
 	}
 
-	err := s.QueuePool.Push(serviceGroup, reqItem)
+	err = s.QueuePool.Push(serviceGroup, reqItem)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusTooManyRequests)
 		return
 	}
 
-	metrics.BrokerReceivedRequestTotalRecord(s.Method, serviceGroup)
+	metrics.BrokerReceivedRequestTotalRecord(s.ScheduleMethod, serviceGroup)
 	return
 }
 
@@ -177,7 +182,12 @@ func (s *HttpBrokerServer) ProcessRequests(ctx context.Context) {
 			continue
 		}
 
-		metrics.BrokerProcessingDurationRecord(s.Method, item.ServiceGroup, time.Since(item.CreateTime).Seconds())
+		httpItem, ok := item.(*queue.HTTPRequestItem)
+		if !ok {
+			continue
+		}
+
+		metrics.BrokerProcessingDurationRecord(s.ScheduleMethod, httpItem.ResourceName(), time.Since(httpItem.GetCreateTime()).Seconds())
 
 		select {
 		case <-ctx.Done():
@@ -185,12 +195,12 @@ func (s *HttpBrokerServer) ProcessRequests(ctx context.Context) {
 		case <-s.stopChan:
 			return
 		case s.WorkPool <- struct{}{}:
-			s.HandleRequest(item)
+			s.HandleRequest(httpItem)
 		}
 	}
 }
 
-func (s *HttpBrokerServer) HandleRequest(item *queue.HttpRequestItem) {
+func (s *HttpBrokerServer) HandleRequest(item *queue.HTTPRequestItem) {
 	defer func() { <-s.WorkPool }()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -199,7 +209,7 @@ func (s *HttpBrokerServer) HandleRequest(item *queue.HttpRequestItem) {
 	req := item.Req.Clone(ctx)
 	s.ReverseProxy.ServeHTTP(item.Writer, req)
 
-	metrics.BackendHandledRequestTotalRecord(s.Method, item.ServiceGroup)
-	metrics.BackendReceivedRequestTotalRecord(s.Method, item.ServiceGroup, time.Since(item.CreateTime).Seconds())
+	metrics.BackendHandledRequestTotalRecord(s.ScheduleMethod, item.ServiceGroup)
+	metrics.BackendReceivedRequestTotalRecord(s.ScheduleMethod, item.ServiceGroup, time.Since(item.CreateTime).Seconds())
 	close(item.WaitChan)
 }

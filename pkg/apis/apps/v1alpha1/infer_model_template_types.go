@@ -14,6 +14,7 @@ type InferModelTemplateStatus struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:openapi-gen=true
+// +kubebuilder:object:root=true
 // +genclient:nonNamespaced
 // +kubebuilder:resource:scope=Cluster
 

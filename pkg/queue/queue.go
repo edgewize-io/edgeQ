@@ -4,11 +4,17 @@ import (
 	"container/list"
 	"fmt"
 	"github.com/edgewize/edgeQ/internal/broker/config"
-	errs "github.com/edgewize/edgeQ/internal/broker/error"
 	"github.com/edgewize/edgeQ/internal/broker/picker"
 	"github.com/edgewize/edgeQ/pkg/constants"
 	"sync"
+	"time"
 )
+
+type QueueItem interface {
+	picker.Resource
+	SetResourceName(name string)
+	GetCreateTime() time.Time
+}
 
 type QueuePool struct {
 	Queues map[string]*Queue
@@ -47,20 +53,20 @@ func NewQueue(cfg config.Queue) *Queue {
 	}
 }
 
-func (qp *QueuePool) Push(serviceGroup string, item *HttpRequestItem) (err error) {
+func (qp *QueuePool) Push(serviceGroup string, item QueueItem) (err error) {
 	qp.mu.Lock()
 	defer qp.mu.Unlock()
 	queue, ok := qp.Queues[serviceGroup]
 	if !ok {
-		err = errs.ErrQueueGroupIsNotExist
-		return
+		item.SetResourceName(constants.DefaultServiceGroup)
+		queue = qp.Queues[constants.DefaultServiceGroup]
 	}
 
 	err = queue.Push(item)
 	return
 }
 
-func (qp *QueuePool) Pop(p picker.Picker) (resultItem *HttpRequestItem, err error) {
+func (qp *QueuePool) Pop(p picker.Picker) (resultItem QueueItem, err error) {
 	qp.mu.Lock()
 	defer qp.mu.Unlock()
 	pickInfo := picker.PickInfo{}
@@ -87,7 +93,7 @@ func (qp *QueuePool) Pop(p picker.Picker) (resultItem *HttpRequestItem, err erro
 	return
 }
 
-func (q *Queue) Push(value interface{}) (err error) {
+func (q *Queue) Push(value QueueItem) (err error) {
 	if q.list.Len() >= q.maxSize {
 		err = fmt.Errorf("queue is full")
 		return
@@ -97,22 +103,22 @@ func (q *Queue) Push(value interface{}) (err error) {
 	return
 }
 
-func (q *Queue) Pop() *HttpRequestItem {
+func (q *Queue) Pop() QueueItem {
 	if q.list.Len() == 0 {
 		return nil
 	}
 
 	front := q.list.Front()
 	q.list.Remove(front)
-	return front.Value.(*HttpRequestItem)
+	return front.Value.(QueueItem)
 }
 
-func (q *Queue) Peek() *HttpRequestItem {
+func (q *Queue) Peek() QueueItem {
 	if q.list.Len() == 0 {
 		return nil
 	}
 
-	return q.list.Front().Value.(*HttpRequestItem)
+	return q.list.Front().Value.(QueueItem)
 }
 
 func (q *Queue) Len() int {

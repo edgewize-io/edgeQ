@@ -10,6 +10,8 @@ type Schedule = xconfig.Schedule
 type Queue = xconfig.Queue
 type ServiceGroup = xconfig.ServiceGroup
 type PromMetrics = xconfig.PromMetrics
+type HTTPConfig = xconfig.HTTPConfig
+type GRPCConfig = xconfig.GRPCConfig
 
 type Config struct {
 	BaseOptions   BaseConfig     `yaml:"base" json:"baseOptions,omitempty" mapstructure:"base"`

@@ -45,13 +45,13 @@ var (
 
 	BrokerProcessingDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "broker_processing_duration_seconds",
-		Help:    "time taken to process requests in broker queues",
+		Help:    "request waiting time in broker queues",
 		Buckets: []float64{0.1, 0.5, 1, 2, 5, 10, 30},
 	}, []string{"pod", "container", "method", "service_group"})
 
 	BackendProcessingDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "broker_backend_processing_duration_seconds",
-		Help:    "time taken to process requests in backend servers",
+		Help:    "request processing time (from receiving the request to returning the backend-processed response)",
 		Buckets: []float64{0.1, 0.5, 1, 2, 5, 10, 30},
 	}, []string{"pod", "container", "method", "service_group"})
 )

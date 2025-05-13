@@ -1,0 +1,12 @@
+{{- if .Values.kubeSphereExtensionEnabled }}
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v1alpha1.apps.edgewize.io
+spec:
+  group: apps.edgewize.io
+  url: http://{{ .Values.service.apiserver.name }}.{{ .Release.Namespace }}.svc:{{ .Values.service.apiserver.port }}
+  version: v1alpha1
+status:
+  state: Available
+{{- end }}

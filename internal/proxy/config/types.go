@@ -7,6 +7,8 @@ import (
 type MeshProxy = xconfig.MeshProxy
 type BaseConfig = xconfig.BaseConfig
 type ServiceGroup = xconfig.ServiceGroup
+type GRPCConfig = xconfig.GRPCConfig
+type HTTPConfig = xconfig.HTTPConfig
 
 // Config defines everything needed for apiserver to deal with external services
 type Config struct {

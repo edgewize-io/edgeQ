@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "edge-qos-controller.fullname" . }}
+  name: {{ include "edge-qos.fullname" . }}
   labels:
     {{- include "edge-qos-controller.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "edge-qos-controller.fullname" . }}
+    name: {{ include "edge-qos.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

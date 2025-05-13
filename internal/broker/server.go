@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/edgewize/edgeQ/internal/broker/config"
-	be "github.com/edgewize/edgeQ/internal/broker/endpoint/http"
+	be "github.com/edgewize/edgeQ/internal/broker/endpoint"
 	"github.com/edgewize/edgeQ/internal/broker/metrics"
 	proto "github.com/edgewize/edgeQ/mindspore_serving/proto"
+	"github.com/edgewize/edgeQ/pkg/endpoint"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/klog/v2"
 	"net"
@@ -20,7 +21,7 @@ import (
 type Server struct {
 	Config          *config.Config
 	listener        net.Listener
-	Endpoint        *be.HttpBrokerServer
+	Endpoint        endpoint.QosEndpoint
 	ServingClient   proto.MSServiceClient
 	lock            sync.RWMutex
 	PromMetricsSrv  *metrics.PromMetricsServer
@@ -29,7 +30,7 @@ type Server struct {
 }
 
 func (s *Server) PrepareRun() (err error) {
-	s.Endpoint, err = be.NewHttpBrokerServer(s.Config)
+	s.Endpoint, err = be.GetBrokerEndpoint(s.Config)
 	if err != nil {
 		return
 	}

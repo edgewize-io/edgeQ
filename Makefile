@@ -24,7 +24,7 @@ APISERVER_IMAGE ?= $(REPO)/edge-qos-apiserver:$(TAG)
 PLATFORMS ?= linux/arm64,linux/amd64
 
 
-CRD_OPTIONS ?= "crd:allowDangerousTypes=true"
+CRD_OPTIONS ?= "crd:allowDangerousTypes=true,generateEmbeddedObjectMeta=true"
 
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -179,7 +179,7 @@ manifests: controller-gen
 	@$(CONTROLLER_GEN) rbac:roleName=edge-qos-role paths="./..." output:rbac:artifacts:config=config/rbac
 	@$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths=./pkg/apis/apps/v1alpha1
 
-	@cp config/crds/* charts/edgeQ/crds/
+	@cp config/crds/* charts/edge-qos/crds/
 
 .PHONY: generate
 generate: controller-gen

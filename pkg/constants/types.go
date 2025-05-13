@@ -76,5 +76,12 @@ var (
 	EdgeInferModelDeploymentTag = "EdgeInferModelDeploymentTag"
 
 	ServiceGroupHeader  = "X-Service-Group"
+	ServiceGroupContext = "x-service-group"
 	TooManyRequestsCode = 429
+
+	GRPCEndpoint = "grpc"
+	HTTPEndpoint = "http"
+
+	ServiceProxy  = "proxy"
+	ServiceBroker = "broker"
 )
