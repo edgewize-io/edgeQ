@@ -1,0 +1,105 @@
+name: Build Container Images
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  GO_VERSION: "1.24.0"
+
+jobs:
+  build:
+    name: build-dev-image
+    runs-on: [self-hosted, edgewize]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.24
+
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+
+      - name: Add hosts to /etc/hosts
+        run: |
+          sudo echo "${{ vars.CLOUD_HARBOR_IP }} ${{ vars.CLOUD_HARBOR }}" | sudo tee -a /etc/hosts
+          sudo echo "${{ vars.EDGE_HARBOR_IP }} ${{ vars.EDGE_HARBOR }}" | sudo tee -a /etc/hosts
+
+      - name: Docker Login
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: ${{ vars.CLOUD_HARBOR }}
+          username: ${{ secrets.DOCKERHUB_CLOUD_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_CLOUD_PASSWD }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+
+      - name: Generating image tag
+        id: runtime-tag
+        run: |
+          echo tag="$(date '+%Y%m%d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and Push api server
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./build/apiserver/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ vars.CLOUD_HARBOR }}/edgewize/edge-qos-apiserver:${{ steps.runtime-tag.outputs.tag }}
+
+      - name: Build and Push controller manager
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./build/controller/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ vars.CLOUD_HARBOR }}/edgewize/edge-qos-controller:${{ steps.runtime-tag.outputs.tag }}
+
+      - name: Docker Login
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: ${{ vars.EDGE_HARBOR }}
+          username: ${{ secrets.DOCKERHUB_EDGE_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_EDGE_PASSWD }}
+
+      - name: Build and Push proxy
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./build/proxy/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ vars.EDGE_HARBOR }}/edgewize/edge-qos-proxy:${{ steps.runtime-tag.outputs.tag }}
+
+      - name: Build and Push broker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./build/broker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ vars.EDGE_HARBOR }}/edgewize/edge-qos-broker:${{ steps.runtime-tag.outputs.tag }}
+
+      - name: Build and Push init container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./build/init-iptables/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ vars.EDGE_HARBOR }}/edgewize/init-iptables:${{ steps.runtime-tag.outputs.tag }}

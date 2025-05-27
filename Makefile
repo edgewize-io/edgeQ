@@ -1,6 +1,5 @@
 include Makefile.tools.mk
 
-GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
 BUILD_TIME := $(shell date -u +"%Y-%m-%d %H:%M:%S UTC" | tr -d " \t\n\r")
 INTERNAL_PROTO_FILES=$(shell find internal -name *.proto)
@@ -8,8 +7,6 @@ CONTAINER_TOOL ?= docker
 DRY_RUN=${DRY_RUN:-}
 
 GO ?= go
-GOOS ?= $(shell go env GOOS)
-GOARCH ?= $(shell go env GOARCH)
 GO_BUILD_LDFLAGS ?= -s -w -extldflags \"-static\" -X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME)
 
 REPO ?= mirrors.thingsdao.com/edgewize
@@ -25,13 +22,6 @@ PLATFORMS ?= linux/arm64,linux/amd64
 
 
 CRD_OPTIONS ?= "crd:allowDangerousTypes=true,generateEmbeddedObjectMeta=true"
-
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
-else
-GOBIN=$(shell go env GOBIN)
-endif
-
 
 .PHONY: proto
 proto:
@@ -82,19 +72,19 @@ help:
 
 .PHONY: build-broker
 build-broker:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o broker cmd/broker/broker.go
+	CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o broker cmd/broker/broker.go
 
 .PHONY: build-proxy
 build-proxy:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o proxy cmd/proxy/proxy.go
+	CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o proxy cmd/proxy/proxy.go
 
 .PHONY: build-apiserver
 build-apiserver:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o apiserver cmd/apiserver/apiserver.go
+	CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o apiserver cmd/apiserver/apiserver.go
 
 .PHONY: build-controller-manager
 build-controller-manager:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o controller-manager cmd/controller/controller-manager.go
+	CGO_ENABLED=0 $(GO) build -ldflags="$(GO_BUILD_LDFLAGS)" -a -o controller-manager cmd/controller/controller-manager.go
 
 
 ##@Build
